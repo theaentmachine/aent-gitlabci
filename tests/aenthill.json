@@ -1,0 +1,16 @@
+{
+	"aents": {
+		"49fb59c98a1bde6b336f7c2fa320bd9e": {
+			"image": "theaentmachine/aent-dockerfile"
+		},
+		"750083dad70da58f437a9168c944cf51": {
+			"image": "theaentmachine/aent-gitlabci:snapshot",
+			"metadata": {
+				"REGISTRY_DOMAIN_NAME": "git.thecodingmachine.com:444"
+			},
+			"dependencies": {
+				"AENT_DOCKERFILE": "49fb59c98a1bde6b336f7c2fa320bd9e"
+			}
+		}
+	}
+}
