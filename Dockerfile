@@ -5,7 +5,7 @@ COPY composer.lock composer.lock
 
 RUN composer install --no-dev
 
-FROM theaentmachine/base-php-aent:0.0.16
+FROM theaentmachine/base-php-aent:0.0.17
 
 LABEL authors="Julien Neuhart <j.neuhart@thecodingmachine.com>"
 
