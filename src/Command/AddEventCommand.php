@@ -5,15 +5,18 @@ namespace TheAentMachine\AentGitLabCI\Command;
 use TheAentMachine\AentGitLabCI\Aenthill\Dependency;
 use TheAentMachine\AentGitLabCI\Aenthill\Metadata;
 use TheAentMachine\AentGitLabCI\GitLabCI\GitLabCIFile;
+use TheAentMachine\Aenthill\CommonDependencies;
+use TheAentMachine\Aenthill\CommonEvents;
 use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Command\AbstractEventCommand;
 use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
+use TheAentMachine\Question\CommonValidators;
 
 final class AddEventCommand extends AbstractEventCommand
 {
     protected function getEventName(): string
     {
-        return 'ADD';
+        return CommonEvents::ADD_EVENT;
     }
 
     /**
@@ -36,13 +39,9 @@ final class AddEventCommand extends AbstractEventCommand
 
         $aentHelper->spacer();
 
-        if (null === Manifest::getMetadataOrNull(Metadata::REGISTRY_DOMAIN_NAME_KEY)) {
+        if (null === Manifest::getDependency(Metadata::REGISTRY_DOMAIN_NAME_KEY)) {
             $registryDomainName = $this->askForRegistryDomainName();
             Manifest::addMetadata(Metadata::REGISTRY_DOMAIN_NAME_KEY, $registryDomainName);
-        }
-
-        if (null === Manifest::getDependencyOrNull(Dependency::AENT_DOCKERFILE_KEY)) {
-            Manifest::addDependency('theaentmachine/aent-dockerfile', Dependency::AENT_DOCKERFILE_KEY, null);
         }
 
         return null;
@@ -53,13 +52,7 @@ final class AddEventCommand extends AbstractEventCommand
         return $this->getAentHelper()->question('Registry domain name')
             ->setHelpText('The domain name of the Docker Container Registry integrated with your Git repository on your GitLab. This is the space where your Docker images are stored.')
             ->compulsory()
-            ->setValidator(function (string $value) {
-                $value = trim($value);
-                if (!\preg_match('/^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.[a-zA-Z]{2,11}?:[0-9]*$/im', $value)) {
-                    throw new \InvalidArgumentException('Invalid domain name "' . $value . '". Note: the domain name must not start with "http(s)://"');
-                }
-                return $value;
-            })
+            ->setValidator(CommonValidators::getDomainNameWithPortValidator())
             ->ask();
     }
 }

@@ -5,13 +5,13 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use TheAentMachine\AentApplication;
 use TheAentMachine\AentGitLabCI\Command\AddEventCommand;
-use TheAentMachine\AentGitLabCI\Command\BuildImageEventCommand;
-use TheAentMachine\AentGitLabCI\Command\DeployDockerComposeEventCommand;
+use TheAentMachine\AentGitLabCI\Command\NewBuildImageJobCommand;
+use TheAentMachine\AentGitLabCI\Command\NewDeployDockerComposeJobEventCommand;
 
 $application = new AentApplication();
 
 $application->add(new AddEventCommand());
-$application->add(new BuildImageEventCommand());
-$application->add(new DeployDockerComposeEventCommand());
+$application->add(new NewBuildImageJobCommand());
+$application->add(new NewDeployDockerComposeJobEventCommand());
 
 $application->run();

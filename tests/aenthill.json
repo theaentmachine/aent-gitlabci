@@ -1,15 +1,11 @@
 {
 	"aents": {
-		"4b2767ef97d18013d563409623e7cd15": {
-			"image": "theaentmachine/aent-dockerfile"
-		},
 		"750083dad70da58f437a9168c944cf51": {
 			"image": "theaentmachine/aent-gitlabci:snapshot",
 			"metadata": {
-				"REGISTRY_DOMAIN_NAME": "git.thecodingmachine.com:444"
-			},
-			"dependencies": {
-				"AENT_DOCKERFILE": "4b2767ef97d18013d563409623e7cd15"
+				"ENV_NAME": "foo",
+				"ENV_TYPE": "PROD",
+				"REGISTRY_DOMAIN_NAME": "foo.bar:444"
 			}
 		}
 	}

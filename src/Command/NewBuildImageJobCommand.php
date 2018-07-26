@@ -7,15 +7,15 @@ use TheAentMachine\AentGitLabCI\Exception\PayloadException;
 use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
 use \TheAentMachine\AentGitLabCI\Exception\JobException;
 use TheAentMachine\AentGitLabCI\GitLabCI\GitLabCIFile;
+use TheAentMachine\Aenthill\CommonEvents;
 use TheAentMachine\Aenthill\Manifest;
-use TheAentMachine\Aenthill\CommonMetadata as AentConsoleMetadata;
 use TheAentMachine\Command\AbstractJsonEventCommand;
 
-final class BuildImageEventCommand extends AbstractJsonEventCommand
+final class NewBuildImageJobCommand extends AbstractJsonEventCommand
 {
     protected function getEventName(): string
     {
-        return 'BUILD_IMAGE';
+        return CommonEvents::NEW_BUILD_IMAGE_JOB_EVENT;
     }
 
     /**
@@ -30,7 +30,7 @@ final class BuildImageEventCommand extends AbstractJsonEventCommand
         $aentHelper = $this->getAentHelper();
         $aentHelper->title("GitLab CI: adding a deploy stage");
 
-        $registryDomainName = Manifest::getMetadata(Metadata::REGISTRY_DOMAIN_NAME_KEY);
+        $registryDomainName = Manifest::mustGetMetadata(Metadata::REGISTRY_DOMAIN_NAME_KEY);
 
         $aentHelper->spacer();
         $this->output->writeln("🦊 Dockerfile: <info>TODO</info>");
