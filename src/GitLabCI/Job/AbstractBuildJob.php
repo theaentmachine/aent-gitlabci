@@ -1,9 +1,9 @@
 <?php
 
 
-namespace TheAentMachine\AentGitLabCI\GitLabCI;
+namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 
-abstract class BuildJobInstructions extends JobInstructions
+abstract class AbstractBuildJob extends AbstractJob
 {
     public function __construct(string $serviceName)
     {

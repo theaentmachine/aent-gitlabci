@@ -1,0 +1,22 @@
+stages:
+- test
+- build
+- deploy
+- cleanup
+deploy_foo:
+  image: 'kroniak/ssh-client:3.6'
+  stage: deploy
+  script:
+  - 'mkdir ~/.ssh'
+  - 'echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts'
+  - 'chmod 644 ~/.ssh/known_hosts'
+  - 'eval $(ssh-agent -s)'
+  - 'ssh-add <(echo "$SSH_PRIVATE_KEY"'
+  - 'ssh deploy@192.168.11.7 "docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD
+    git.thecodingmachine.com:444"'
+  - 'ssh deploy@192.168.11.7 "cd /foo && docker-compose down --rmi=all" || true'
+  - 'scp docker-compose.yml deploy@192.168.11.7:/foo/docker-compose.yml'
+  - 'ssh deploy@192.168.11.7 "cd /foo && docker-compose up -d"'
+  except:
+  - master
+  when: manual

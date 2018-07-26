@@ -4,6 +4,7 @@ namespace TheAentMachine\AentGitLabCI\GitLabCI;
 
 use Symfony\Component\Yaml\Yaml;
 use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
+use TheAentMachine\AentGitLabCI\GitLabCI\Job\AbstractDeployJob;
 use TheAentMachine\Aenthill\Pheromone;
 use TheAentMachine\YamlTools\YamlTools;
 
@@ -94,11 +95,11 @@ class GitLabCIFile
     }
 
     /**
-     * @param DeployJobInstructions $instructions
+     * @param AbstractDeployJob $instructions
      * @return GitLabCIFile
      * @throws GitLabCIFileException
      */
-    public function addDeploy(DeployJobInstructions $instructions): self
+    public function addDeploy(AbstractDeployJob $instructions): self
     {
         if (!$this->exist()) {
             throw GitLabCIFileException::missingFile();

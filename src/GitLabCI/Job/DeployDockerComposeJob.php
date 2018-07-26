@@ -1,9 +1,9 @@
 <?php
 
 
-namespace TheAentMachine\AentGitLabCI\GitLabCI;
+namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 
-class DeployDockerComposeJobInstructions extends DeployJobInstructions
+class DeployDockerComposeJob extends AbstractDeployJob
 {
     public function __construct(string $envName, string $registryDomainName, string $dockerComposeFileName, string $remoteIP, string $remoteUser, string $remotePath)
     {

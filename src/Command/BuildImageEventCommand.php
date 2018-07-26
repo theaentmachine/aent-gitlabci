@@ -5,7 +5,7 @@ namespace TheAentMachine\AentGitLabCI\Command;
 use TheAentMachine\AentGitLabCI\Aenthill\Metadata;
 use TheAentMachine\AentGitLabCI\Exception\PayloadException;
 use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
-use \TheAentMachine\AentGitLabCI\Exception\JobInstructionsException;
+use \TheAentMachine\AentGitLabCI\Exception\JobException;
 use TheAentMachine\AentGitLabCI\GitLabCI\GitLabCIFile;
 use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Aenthill\Metadata as AentConsoleMetadata;
@@ -23,7 +23,7 @@ class BuildImageEventCommand extends JsonEventCommand
      * @return array|null
      * @throws GitLabCIFileException
      * @throws PayloadException
-     * @throws JobInstructionsException
+     * @throws JobException
      */
     protected function executeJsonEvent(array $payload): ?array
     {

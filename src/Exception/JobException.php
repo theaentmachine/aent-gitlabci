@@ -5,7 +5,7 @@ namespace TheAentMachine\AentGitLabCI\Exception;
 
 use TheAentMachine\Exception\AenthillException;
 
-class JobInstructionsException extends AenthillException
+class JobException extends AenthillException
 {
     public static function cannotAddOnly(string $branch): self
     {

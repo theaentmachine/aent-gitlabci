@@ -1,11 +1,11 @@
 <?php
 
 
-namespace TheAentMachine\AentGitLabCI\GitLabCI;
+namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 
-use TheAentMachine\AentGitLabCI\Exception\JobInstructionsException;
+use TheAentMachine\AentGitLabCI\Exception\JobException;
 
-abstract class JobInstructions
+abstract class AbstractJob
 {
     /** @var string */
     protected $jobName;
@@ -89,7 +89,7 @@ abstract class JobInstructions
 
     /**
      * @param string $branch
-     * @throws JobInstructionsException
+     * @throws JobException
      */
     public function addOnly(string $branch): void
     {
@@ -97,14 +97,14 @@ abstract class JobInstructions
             return;
         }
         if (in_array($branch, $this->except)) {
-            throw JobInstructionsException::cannotAddOnly($branch);
+            throw JobException::cannotAddOnly($branch);
         }
         $this->except[] = $branch;
     }
 
     /**
      * @param string $branch
-     * @throws JobInstructionsException
+     * @throws JobException
      */
     public function addExcept(string $branch): void
     {
@@ -112,7 +112,7 @@ abstract class JobInstructions
             return;
         }
         if (in_array($branch, $this->only)) {
-            throw JobInstructionsException::cannotAddExcept($branch);
+            throw JobException::cannotAddExcept($branch);
         }
         $this->except[] = $branch;
     }

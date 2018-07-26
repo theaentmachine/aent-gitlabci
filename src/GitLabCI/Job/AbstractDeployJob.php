@@ -1,9 +1,9 @@
 <?php
 
 
-namespace TheAentMachine\AentGitLabCI\GitLabCI;
+namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 
-abstract class DeployJobInstructions extends JobInstructions
+abstract class AbstractDeployJob extends AbstractJob
 {
     public function __construct(string $envName)
     {

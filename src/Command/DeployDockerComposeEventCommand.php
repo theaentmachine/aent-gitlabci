@@ -3,10 +3,10 @@
 namespace TheAentMachine\AentGitLabCI\Command;
 
 use TheAentMachine\AentGitLabCI\Aenthill\Metadata;
-use TheAentMachine\AentGitLabCI\GitLabCI\DeployDockerComposeJobInstructions;
+use TheAentMachine\AentGitLabCI\GitLabCI\Job\DeployDockerComposeJob;
 use TheAentMachine\AentGitLabCI\Exception\PayloadException;
 use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
-use \TheAentMachine\AentGitLabCI\Exception\JobInstructionsException;
+use \TheAentMachine\AentGitLabCI\Exception\JobException;
 use TheAentMachine\AentGitLabCI\GitLabCI\GitLabCIFile;
 use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Aenthill\Metadata as AentConsoleMetadata;
@@ -24,7 +24,7 @@ class DeployDockerComposeEventCommand extends JsonEventCommand
      * @return array|null
      * @throws GitLabCIFileException
      * @throws PayloadException
-     * @throws JobInstructionsException
+     * @throws JobException
      */
     protected function executeJsonEvent(array $payload): ?array
     {
@@ -46,7 +46,7 @@ class DeployDockerComposeEventCommand extends JsonEventCommand
         $remotePath = $this->askForRemotePath();
         $branch = $this->askForBranch($envType);
 
-        $instructions = new DeployDockerComposeJobInstructions($envName, $registryDomainName, $dockerComposeFilename, $remoteIP, $remoteUser, $remotePath);
+        $instructions = new DeployDockerComposeJob($envName, $registryDomainName, $dockerComposeFilename, $remoteIP, $remoteUser, $remotePath);
         $instructions->addOnly($branch);
 
         $file = new GitLabCIFile();
