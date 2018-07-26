@@ -6,10 +6,10 @@ use TheAentMachine\AentGitLabCI\Aenthill\Dependency;
 use TheAentMachine\AentGitLabCI\Aenthill\Metadata;
 use TheAentMachine\AentGitLabCI\GitLabCI\GitLabCIFile;
 use TheAentMachine\Aenthill\Manifest;
-use TheAentMachine\Command\EventCommand;
+use TheAentMachine\Command\AbstractEventCommand;
 use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
 
-final class AddEventCommand extends EventCommand
+final class AddEventCommand extends AbstractEventCommand
 {
     protected function getEventName(): string
     {

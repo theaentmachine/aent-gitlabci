@@ -9,10 +9,10 @@ use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
 use \TheAentMachine\AentGitLabCI\Exception\JobException;
 use TheAentMachine\AentGitLabCI\GitLabCI\GitLabCIFile;
 use TheAentMachine\Aenthill\Manifest;
-use TheAentMachine\Aenthill\Metadata as AentConsoleMetadata;
-use TheAentMachine\Command\JsonEventCommand;
+use TheAentMachine\Aenthill\CommonMetadata as AentConsoleMetadata;
+use TheAentMachine\Command\AbstractJsonEventCommand;
 
-final class DeployDockerComposeEventCommand extends JsonEventCommand
+final class DeployDockerComposeEventCommand extends AbstractJsonEventCommand
 {
     protected function getEventName(): string
     {
