@@ -3,7 +3,7 @@
 
 namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 
-class DeployDockerComposeJob extends AbstractDeployJob
+final class DeployDockerComposeJob extends AbstractDeployJob
 {
     public function __construct(string $envName, string $registryDomainName, string $dockerComposeFileName, string $remoteIP, string $remoteUser, string $remotePath)
     {

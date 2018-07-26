@@ -8,7 +8,7 @@ use TheAentMachine\AentGitLabCI\GitLabCI\Job\AbstractDeployJob;
 use TheAentMachine\Aenthill\Pheromone;
 use TheAentMachine\YamlTools\YamlTools;
 
-class GitLabCIFile
+final class GitLabCIFile
 {
     public const DEFAULT_FILENAME = '.gitlab-ci.yml';
 

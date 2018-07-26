@@ -12,7 +12,7 @@ use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Aenthill\Metadata as AentConsoleMetadata;
 use TheAentMachine\Command\JsonEventCommand;
 
-class DeployDockerComposeEventCommand extends JsonEventCommand
+final class DeployDockerComposeEventCommand extends JsonEventCommand
 {
     protected function getEventName(): string
     {

@@ -11,7 +11,7 @@ use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Aenthill\Metadata as AentConsoleMetadata;
 use TheAentMachine\Command\JsonEventCommand;
 
-class BuildImageEventCommand extends JsonEventCommand
+final class BuildImageEventCommand extends JsonEventCommand
 {
     protected function getEventName(): string
     {

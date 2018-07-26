@@ -5,7 +5,7 @@ namespace TheAentMachine\AentGitLabCI\Exception;
 
 use TheAentMachine\Exception\AenthillException;
 
-class PayloadException extends AenthillException
+final class PayloadException extends AenthillException
 {
     public static function missingKey(string $key): self
     {

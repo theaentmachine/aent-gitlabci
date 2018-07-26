@@ -9,7 +9,7 @@ use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Command\EventCommand;
 use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
 
-class AddEventCommand extends EventCommand
+final class AddEventCommand extends EventCommand
 {
     protected function getEventName(): string
     {

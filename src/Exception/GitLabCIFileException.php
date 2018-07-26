@@ -5,7 +5,7 @@ namespace TheAentMachine\AentGitLabCI\Exception;
 
 use TheAentMachine\Exception\AenthillException;
 
-class GitLabCIFileException extends AenthillException
+final class GitLabCIFileException extends AenthillException
 {
     public static function missingFile(): self
     {
