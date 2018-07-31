@@ -14,4 +14,4 @@ docker run -v $(pwd)/..:/app \
     -e PHEROMONE_LOG_LEVEL=DEBUG \
     -ti \
     theaentmachine/base-php-aent:0.0.17 \
-    php /app/src/aent.php NEW_DEPLOY_DOCKER_COMPOSE_JOB docker-compose.yml
+    php /app/src/aent.php NEW_DEPLOY_DOCKER_COMPOSE_JOB "docker-compose.yml"

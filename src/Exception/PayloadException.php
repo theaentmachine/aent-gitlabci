@@ -10,6 +10,6 @@ final class PayloadException extends AenthillException
 {
     public static function missingDockerComposeFilename(): self
     {
-        return new self(CommonEvents::NEW_DEPLOY_JOB_DOCKER_COMPOSE_EVENT . ' event requires a payload with the Docker Compose filename');
+        return new self(CommonEvents::NEW_DEPLOY_DOCKER_COMPOSE_JOB_EVENT . ' event requires a payload with the Docker Compose filename');
     }
 }

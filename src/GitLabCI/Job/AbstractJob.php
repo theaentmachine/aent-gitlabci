@@ -73,7 +73,7 @@ abstract class AbstractJob
         }
 
         if ($this->hasOnly()) {
-            $obj[$this->jobName]['only'] = $this->environment;
+            $obj[$this->jobName]['only'] = $this->only;
         }
 
         if ($this->hasExcept()) {
@@ -88,33 +88,33 @@ abstract class AbstractJob
     }
 
     /**
-     * @param string $branch
+     * @param string $identifier
      * @throws JobException
      */
-    public function addOnly(string $branch): void
+    public function addOnly(string $identifier): void
     {
-        if (in_array($branch, $this->only)) {
+        if (in_array($identifier, $this->only)) {
             return;
         }
-        if (in_array($branch, $this->except)) {
-            throw JobException::cannotAddOnly($branch);
+        if (in_array($identifier, $this->except)) {
+            throw JobException::cannotAddOnly($identifier);
         }
-        $this->except[] = $branch;
+        $this->only[] = $identifier;
     }
 
     /**
-     * @param string $branch
+     * @param string $identifier
      * @throws JobException
      */
-    public function addExcept(string $branch): void
+    public function addExcept(string $identifier): void
     {
-        if (in_array($branch, $this->except)) {
+        if (in_array($identifier, $this->except)) {
             return;
         }
-        if (in_array($branch, $this->only)) {
-            throw JobException::cannotAddExcept($branch);
+        if (in_array($identifier, $this->only)) {
+            throw JobException::cannotAddExcept($identifier);
         }
-        $this->except[] = $branch;
+        $this->except[] = $identifier;
     }
 
     private function hasServices(): bool

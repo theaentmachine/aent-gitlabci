@@ -6,6 +6,7 @@ use Symfony\Component\Yaml\Yaml;
 use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
 use TheAentMachine\AentGitLabCI\GitLabCI\Job\AbstractDeployJob;
 use TheAentMachine\Aenthill\Pheromone;
+use TheAentMachine\Exception\MissingEnvironmentVariableException;
 use TheAentMachine\YamlTools\YamlTools;
 
 final class GitLabCIFile
@@ -18,6 +19,10 @@ final class GitLabCIFile
     /** @var \SplFileInfo */
     private $file;
 
+    /**
+     * GitLabCIFile constructor.
+     * @throws MissingEnvironmentVariableException
+     */
     public function __construct()
     {
         $this->path = Pheromone::getContainerProjectDirectory() . '/' . self::DEFAULT_FILENAME;
@@ -25,7 +30,7 @@ final class GitLabCIFile
 
     public function exist(): bool
     {
-        return file_exists($this->path);
+        return \file_exists($this->path);
     }
 
     /**
@@ -48,9 +53,18 @@ final class GitLabCIFile
             return $this;
         }
 
-        file_put_contents($this->path, '');
-        chown($this->path, fileowner(\dirname($this->path)));
-        chgrp($this->path, filegroup(\dirname($this->path)));
+        \file_put_contents($this->path, '');
+
+        $fileOwner = \fileowner(\dirname($this->path));
+        if (!is_bool($fileOwner)) {
+            \chown($this->path, $fileOwner);
+        }
+
+        $fileGroup = \filegroup(\dirname($this->path));
+        if (!is_bool($fileGroup)) {
+            \chgrp($this->path, $fileGroup);
+        }
+
         $this->file = new \SplFileInfo($this->path);
 
         return $this;
@@ -76,7 +90,7 @@ final class GitLabCIFile
         ];
 
         $yaml = Yaml::dump($stages, 256, 2, Yaml::DUMP_OBJECT_AS_MAP);
-        file_put_contents($this->path, $yaml);
+        \file_put_contents($this->path, $yaml);
 
         return $this;
     }
@@ -95,17 +109,17 @@ final class GitLabCIFile
     }
 
     /**
-     * @param AbstractDeployJob $instructions
+     * @param AbstractDeployJob $job
      * @return GitLabCIFile
      * @throws GitLabCIFileException
      */
-    public function addDeploy(AbstractDeployJob $instructions): self
+    public function addDeploy(AbstractDeployJob $job): self
     {
         if (!$this->exist()) {
             throw GitLabCIFileException::missingFile();
         }
 
-        $yaml = Yaml::dump($instructions->dump(), 256, 2, Yaml::DUMP_OBJECT_AS_MAP);
+        $yaml = Yaml::dump($job->dump(), 256, 2, Yaml::DUMP_OBJECT_AS_MAP);
         YamlTools::mergeContentIntoFile($yaml, $this->path);
 
         return $this;

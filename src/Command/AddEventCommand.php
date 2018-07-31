@@ -2,10 +2,8 @@
 
 namespace TheAentMachine\AentGitLabCI\Command;
 
-use TheAentMachine\AentGitLabCI\Aenthill\Dependency;
 use TheAentMachine\AentGitLabCI\Aenthill\Metadata;
 use TheAentMachine\AentGitLabCI\GitLabCI\GitLabCIFile;
-use TheAentMachine\Aenthill\CommonDependencies;
 use TheAentMachine\Aenthill\CommonEvents;
 use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Command\AbstractEventCommand;
