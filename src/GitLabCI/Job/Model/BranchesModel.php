@@ -39,7 +39,7 @@ final class BranchesModel
     public static function newFromMetadata(): self
     {
         $isMultipleBranches = Manifest::mustGetMetadata(Metadata::IS_MULTIPLE_BRANCHES_KEY);
-        $isMultipleBranches = boolval($isMultipleBranches);
+        $isMultipleBranches = $isMultipleBranches === 'true';
 
         if ($isMultipleBranches) {
             $branchesToIgnore = Manifest::getMetadata(Metadata::BRANCHES_TO_IGNORE_KEY);
@@ -58,7 +58,7 @@ final class BranchesModel
      */
     public function feedMetadata(): void
     {
-        Manifest::addMetadata(Metadata::IS_MULTIPLE_BRANCHES_KEY, "" . $this->isMultipleBranches);
+        Manifest::addMetadata(Metadata::IS_MULTIPLE_BRANCHES_KEY, $this->isMultipleBranches ? 'true' : 'false');
 
         if ($this->isMultipleBranches && !empty($this->branchesToIgnore)) {
             Manifest::addMetadata(Metadata::BRANCHES_TO_IGNORE_KEY, \implode(';', $this->branchesToIgnore));

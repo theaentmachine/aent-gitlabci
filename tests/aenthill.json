@@ -3,16 +3,8 @@
 		"750083dad70da58f437a9168c944cf51": {
 			"image": "theaentmachine/aent-gitlabci:snapshot",
 			"metadata": {
-				"BRANCH": "master",
-				"DEPLOY_TYPE": "Remote server",
 				"ENV_NAME": "foo",
-				"ENV_TYPE": "PROD",
-				"IS_MANUAL": "1",
-				"IS_MULTIPLE_BRANCHES": "",
-				"REGISTRY_DOMAIN_NAME": "git.thecodingmachine.com:444",
-				"REMOTE_BASE_PATH": "/foo",
-				"REMOTE_IP": "192.168.7.11",
-				"REMOTE_USER": "foo"
+				"ENV_TYPE": "PROD"
 			}
 		}
 	}

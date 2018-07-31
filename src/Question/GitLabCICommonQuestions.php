@@ -141,7 +141,7 @@ final class GitLabCICommonQuestions
     public function askForManual(): bool
     {
         $manual = Manifest::getMetadata(Metadata::IS_MANUAL_KEY);
-        if (null !== $manual) {
+        if (!empty($manual)) {
             return boolval($manual);
         }
 
@@ -150,8 +150,8 @@ final class GitLabCICommonQuestions
             ->yesNoQuestion()
             ->ask();
 
-        Manifest::addMetadata(Metadata::IS_MANUAL_KEY, "" . boolval($manual));
+        Manifest::addMetadata(Metadata::IS_MANUAL_KEY, $manual ? 'true' : 'false');
 
-        return boolval($manual);
+        return $manual === 'true';
     }
 }
