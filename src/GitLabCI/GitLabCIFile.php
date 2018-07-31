@@ -4,6 +4,7 @@ namespace TheAentMachine\AentGitLabCI\GitLabCI;
 
 use Symfony\Component\Yaml\Yaml;
 use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
+use TheAentMachine\AentGitLabCI\GitLabCI\Job\AbstractBuildJob;
 use TheAentMachine\AentGitLabCI\GitLabCI\Job\AbstractDeployJob;
 use TheAentMachine\Aenthill\Pheromone;
 use TheAentMachine\Exception\MissingEnvironmentVariableException;
@@ -96,14 +97,18 @@ final class GitLabCIFile
     }
 
     /**
+     * @param AbstractBuildJob $job
      * @return GitLabCIFile
      * @throws GitLabCIFileException
      */
-    public function addBuild(): self
+    public function addBuild(AbstractBuildJob $job): self
     {
         if (!$this->exist()) {
             throw GitLabCIFileException::missingFile();
         }
+
+        $yaml = Yaml::dump($job->dump(), 256, 2, Yaml::DUMP_OBJECT_AS_MAP);
+        YamlTools::mergeContentIntoFile($yaml, $this->path);
 
         return $this;
     }
