@@ -62,6 +62,7 @@ final class NewBuildImageJobCommand extends AbstractJsonEventCommand
 
         $file = new GitLabCIFile();
         $file->findOrCreate();
+        $file->addBuild($job);
 
         $this->output->writeln('🦊 <info>' . GitLabCIFile::DEFAULT_FILENAME . '</info> has been successfully updated!');
 
