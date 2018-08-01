@@ -149,8 +149,9 @@ final class GitLabCICommonQuestions
             ->compulsory()
             ->yesNoQuestion()
             ->ask();
+        $manual = $manual ? 'true' : 'false';
 
-        Manifest::addMetadata(Metadata::IS_MANUAL_KEY, $manual ? 'true' : 'false');
+        Manifest::addMetadata(Metadata::IS_MANUAL_KEY, $manual);
 
         return $manual === 'true';
     }
