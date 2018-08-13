@@ -20,4 +20,5 @@ final class Metadata
 
     // values...
     public const DEPLOY_TYPE_REMOTE_SERVER = 'Remote server';
+    public const DEPLOY_TYPE_GCLOUD = 'GCloud';
 }

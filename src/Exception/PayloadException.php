@@ -18,6 +18,11 @@ final class PayloadException extends AenthillException
         return new self(CommonEvents::NEW_DEPLOY_DOCKER_COMPOSE_JOB_EVENT . ' event requires a payload with the Docker Compose filename');
     }
 
+    public static function missingKubernetesPathname(): self
+    {
+        return new self(CommonEvents::NEW_DEPLOY_KUBERNETES_JOB_EVENT . ' event requires a payload with the Kubernetes pathname');
+    }
+
     public static function missingServiceName(): self
     {
         return new self(CommonEvents::NEW_BUILD_IMAGE_JOB_EVENT . ' event requires a payload with the service name');

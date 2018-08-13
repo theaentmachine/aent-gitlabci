@@ -8,10 +8,6 @@ use TheAentMachine\AentGitLabCI\GitLabCI\Job\Model\BranchesModel;
 
 final class DeployDockerComposeJob extends AbstractDeployJob
 {
-    public function __construct(string $identifier)
-    {
-        parent::__construct($identifier);
-    }
 
     /**
      * @param string $identifier
@@ -27,7 +23,7 @@ final class DeployDockerComposeJob extends AbstractDeployJob
      */
     public static function newDeployOnRemoteServer(string $identifier, string $registryDomainName, string $dockerComposeFilename, string $remoteIP, string $remoteUser, string $remoteBasePath, BranchesModel $branches, bool $isManual): self
     {
-        $self = new DeployDockerComposeJob($identifier);
+        $self = new self($identifier);
 
         $self->image = 'kroniak/ssh-client:3.6';
         $self->variables = [

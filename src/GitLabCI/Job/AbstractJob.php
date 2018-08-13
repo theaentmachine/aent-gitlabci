@@ -93,10 +93,10 @@ abstract class AbstractJob
      */
     public function addOnly(string $identifier): void
     {
-        if (in_array($identifier, $this->only)) {
+        if (\in_array($identifier, $this->only)) {
             return;
         }
-        if (in_array($identifier, $this->except)) {
+        if (\in_array($identifier, $this->except)) {
             throw JobException::cannotAddOnly($identifier);
         }
         $this->only[] = $identifier;
@@ -108,10 +108,10 @@ abstract class AbstractJob
      */
     public function addExcept(string $identifier): void
     {
-        if (in_array($identifier, $this->except)) {
+        if (\in_array($identifier, $this->except)) {
             return;
         }
-        if (in_array($identifier, $this->only)) {
+        if (\in_array($identifier, $this->only)) {
             throw JobException::cannotAddExcept($identifier);
         }
         $this->except[] = $identifier;
