@@ -37,8 +37,7 @@ final class DeployKubernetesJob extends AbstractDeployJob
             '/kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} delete all --all',
             'cd ${K8S_BASE_PATH}', '# Looping through directories and applying k8s config files',
             'for template_file in $(find . -type f -name "*.templates"); do sed -e "s/#ENVIRONMENT#/${CI_COMMIT_REF_SLUG}/g" $template_file > ${template_file::-9}; done',
-            'for yml_file in $(find . -type f -name "*.yml" -or -name "*.yaml"); do /kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} apply -f yml_file; done',
-            'sed -e "s/#ENVIRONMENT#/${CI_COMMIT_REF_SLUG}/g" web.yaml.template > web.yaml',
+            'for yml_file in $(find . -type f -name "*.yml" -or -name "*.yaml"); do /kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} apply -f yml_file; done'
         ];
 
         $self->addOnly('branches');
