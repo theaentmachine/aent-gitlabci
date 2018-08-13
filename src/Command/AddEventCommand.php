@@ -8,6 +8,7 @@ use TheAentMachine\AentGitLabCI\GitLabCI\GitLabCIFile;
 use TheAentMachine\Aenthill\CommonEvents;
 use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Command\AbstractEventCommand;
+use TheAentMachine\Exception\MissingEnvironmentVariableException;
 use TheAentMachine\Question\CommonValidators;
 
 final class AddEventCommand extends AbstractEventCommand
@@ -21,7 +22,7 @@ final class AddEventCommand extends AbstractEventCommand
      * @param null|string $payload
      * @return null|string
      * @throws GitLabCIFileException
-     * @throws \TheAentMachine\Exception\MissingEnvironmentVariableException
+     * @throws MissingEnvironmentVariableException
      */
     protected function executeEvent(?string $payload): ?string
     {
