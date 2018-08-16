@@ -61,12 +61,21 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
         $aentHelper->spacer();
 
         $deployJob = $this->askForDeployType();
-        $cleanUpJob = $this->createCleanupOnGCloud();
+
 
         $file = new GitLabCIFile();
         $file->findOrCreate();
         $file->addDeploy($deployJob);
-        $file->addCleanUp($cleanUpJob);
+        switch (Manifest::mustGetMetadata(Metadata::DEPLOY_TYPE_KEY)) {
+            case Metadata::DEPLOY_TYPE_GCLOUD:
+                $cleanUpJob = $this->createCleanupOnGCloud();
+                $file->addCleanUp($cleanUpJob);
+                break;
+            case Metadata::DEPLOY_TYPE_RANCHER:
+                $cleanUpJob = $this->createCleanupForRancher();
+                $file->addCleanUp($cleanUpJob);
+                break;
+        }
 
         $this->output->writeln('🦊 <info>' . GitLabCIFile::DEFAULT_FILENAME . '</info> has been successfully updated!');
 
@@ -85,7 +94,8 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
         if (null === $deployType) {
             $deployType = $this->getAentHelper()
                 ->choiceQuestion('Select on which provider you want to deploy your stack', [
-                    Metadata::DEPLOY_TYPE_GCLOUD
+                    Metadata::DEPLOY_TYPE_GCLOUD,
+                    Metadata::DEPLOY_TYPE_RANCHER
                 ])
                 ->ask();
         }
@@ -93,6 +103,8 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
         switch ($deployType) {
             case Metadata::DEPLOY_TYPE_GCLOUD:
                 return $this->createDeployOnGCloud();
+            case Metadata::DEPLOY_TYPE_RANCHER:
+                return $this->createDeployOnRancher();
             default:
                 throw JobException::unknownDeployType($deployType);
         }
@@ -133,7 +145,52 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
         $branchesModel = BranchesModel::newFromMetadata();
         $isManual = $gitlabCICommonQuestions->askForManual();
 
-        return CleanupKubernetesJob::newCleanup(
+        return CleanupKubernetesJob::newCleanupForGCloud(
+            $this->envName,
+            $registryDomainName,
+            $projectGroup,
+            $projectName,
+            $branchesModel,
+            $isManual
+        );
+    }
+
+    /**
+     * @return DeployKubernetesJob
+     * @throws JobException
+     * @throws ManifestException
+     */
+    private function createDeployOnRancher(): DeployKubernetesJob
+    {
+        Manifest::addMetadata(Metadata::DEPLOY_TYPE_KEY, Metadata::DEPLOY_TYPE_RANCHER);
+
+        $gitlabCICommonQuestions = new GitLabCICommonQuestions($this->getAentHelper());
+        $branchesModel = BranchesModel::newFromMetadata();
+        $isManual = $gitlabCICommonQuestions->askForManual();
+
+        return DeployKubernetesJob::newDeployOnRancher(
+            $this->envName,
+            $this->k8sDirName,
+            $branchesModel,
+            $isManual
+        );
+    }
+
+    /**
+     * @return CleanupKubernetesJob
+     * @throws JobException
+     * @throws ManifestException
+     */
+    private function createCleanupForRancher(): CleanupKubernetesJob
+    {
+        $gitlabCICommonQuestions = new GitLabCICommonQuestions($this->getAentHelper());
+        $registryDomainName = Manifest::mustGetMetadata(Metadata::REGISTRY_DOMAIN_NAME_KEY);
+        $projectGroup = Manifest::mustGetMetadata(Metadata::PROJECT_GROUP_KEY);
+        $projectName = Manifest::mustGetMetadata(Metadata::PROJECT_NAME_KEY);
+        $branchesModel = BranchesModel::newFromMetadata();
+        $isManual = $gitlabCICommonQuestions->askForManual();
+
+        return CleanupKubernetesJob::newCleanupForRancher(
             $this->envName,
             $registryDomainName,
             $projectGroup,
