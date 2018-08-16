@@ -101,7 +101,9 @@ final class AddEventCommand extends AbstractEventCommand
         } catch (ManifestException | JobException $e) {
             if ($forSingleEnvironment) {
                 $branch = $this->askForBranch(true);
-                return new BranchesModel([$branch], []);
+                $branchesModel = new BranchesModel([$branch], []);
+                $branchesModel->feedMetadata();
+                return $branchesModel;
             }
             $singleBranch = 'On one single branch';
             $allBranches = 'On all branches';

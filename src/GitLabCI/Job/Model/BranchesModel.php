@@ -38,7 +38,7 @@ final class BranchesModel
      */
     public static function newFromMetadata(): self
     {
-        $branches = \explode(';', Manifest::mustGetMetadata(Metadata::BRANCH_KEY));
+        $branches = \explode(';', Manifest::mustGetMetadata(Metadata::BRANCHES_KEY));
 
         $branchesToIgnore = Manifest::getMetadata(Metadata::BRANCHES_TO_IGNORE_KEY);
         $branchesToIgnore = null === $branchesToIgnore ? [] : \explode(';', $branchesToIgnore);
@@ -48,7 +48,7 @@ final class BranchesModel
 
     public function feedMetadata(): void
     {
-        Manifest::addMetadata(Metadata::BRANCH_KEY, \implode(';', $this->branches));
+        Manifest::addMetadata(Metadata::BRANCHES_KEY, \implode(';', $this->branches));
         if (!empty($this->branchesToIgnore)) {
             Manifest::addMetadata(Metadata::BRANCHES_TO_IGNORE_KEY, \implode(';', $this->branchesToIgnore));
         }
