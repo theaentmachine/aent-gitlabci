@@ -16,12 +16,12 @@ final class DeployDockerComposeJob extends AbstractDeployJob
      * @param string $remoteIP
      * @param string $remoteUser
      * @param string $remoteBasePath
-     * @param BranchesModel $branches
+     * @param BranchesModel $branchesModel
      * @param bool $isManual
      * @return DeployDockerComposeJob
      * @throws JobException
      */
-    public static function newDeployOnRemoteServer(string $identifier, string $registryDomainName, string $dockerComposeFilename, string $remoteIP, string $remoteUser, string $remoteBasePath, BranchesModel $branches, bool $isManual): self
+    public static function newDeployOnRemoteServer(string $identifier, string $registryDomainName, string $dockerComposeFilename, string $remoteIP, string $remoteUser, string $remoteBasePath, BranchesModel $branchesModel, bool $isManual): self
     {
         $self = new self($identifier);
 
@@ -48,12 +48,12 @@ final class DeployDockerComposeJob extends AbstractDeployJob
             'ssh ${REMOTE_USER}@${REMOTE_IP} "cd ${REMOTE_BASE_PATH} && docker-compose up -d"'
         ];
 
-        $branch = $branches->getBranch();
-        if (empty($branch)) {
-            throw JobException::branchIsNull();
+        foreach ($branchesModel->getBranches() as $branch) {
+            $self->addOnly($branch);
         }
-
-        $self->addOnly($branch);
+        foreach ($branchesModel->getBranchesToIgnore() as $branch) {
+            $self->addExcept($branch);
+        }
         $self->manual = $isManual;
 
         return $self;

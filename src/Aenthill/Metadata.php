@@ -15,8 +15,8 @@ final class Metadata
     public const REMOTE_BASE_PATH_KEY = 'REMOTE_BASE_PATH';
     public const BRANCH_KEY = 'BRANCH';
     public const BRANCHES_TO_IGNORE_KEY = 'BRANCHES_TO_IGNORE';
-    public const IS_MULTIPLE_BRANCHES_KEY = 'IS_MULTIPLE_BRANCHES';
     public const IS_MANUAL_KEY = 'IS_MANUAL';
+    public const KUBERNETES_DIR_PATH_KEY = 'KUBERNETES_DIR_PATH';
 
     // values...
     public const DEPLOY_TYPE_REMOTE_SERVER = 'Remote server';

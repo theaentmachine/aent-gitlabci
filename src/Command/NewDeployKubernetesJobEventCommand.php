@@ -9,6 +9,7 @@ use TheAentMachine\AentGitLabCI\Exception\PayloadException;
 use TheAentMachine\AentGitLabCI\GitLabCI\GitLabCIFile;
 use TheAentMachine\AentGitLabCI\GitLabCI\Job\CleanupKubernetesJob;
 use TheAentMachine\AentGitLabCI\GitLabCI\Job\DeployKubernetesJob;
+use TheAentMachine\AentGitLabCI\GitLabCI\Job\Model\BranchesModel;
 use TheAentMachine\AentGitLabCI\Question\GitLabCICommonQuestions;
 use TheAentMachine\Aenthill\CommonEvents;
 use TheAentMachine\Aenthill\CommonMetadata;
@@ -26,7 +27,7 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
     private $registryDomainName;
 
     /** @var string */
-    private $k8sPathname;
+    private $k8sDirname;
 
     protected function getEventName(): string
     {
@@ -48,15 +49,15 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
 
         $aentHelper->title('GitLab CI: adding a deploy stage');
 
-        if (empty($payload)) {
+        if (null === $payload) {
             throw PayloadException::missingKubernetesPathname();
         }
 
         $this->envName = Manifest::mustGetMetadata(CommonMetadata::ENV_NAME_KEY);
         $this->registryDomainName = Manifest::mustGetMetadata(Metadata::REGISTRY_DOMAIN_NAME_KEY);
-        $this->k8sPathname = $payload;
+        $this->k8sDirname = $payload;
 
-        $this->output->writeln("🦊×☸️ Kubernetes path: <info>$this->k8sPathname</info>");
+        $this->output->writeln("🦊×☸️ Kubernetes folder: <info>$this->k8sDirname</info>");
         $aentHelper->spacer();
 
         $deployJob = $this->askForDeployType();
@@ -67,7 +68,6 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
         $file->addDeploy($deployJob);
         $file->addCleanUp($cleanUpJob);
 
-
         $this->output->writeln('🦊 <info>' . GitLabCIFile::DEFAULT_FILENAME . '</info> has been successfully updated!');
 
         return null;
@@ -76,6 +76,7 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
     /**
      * @return DeployKubernetesJob
      * @throws JobException
+     * @throws ManifestException
      */
     private function askForDeployType(): DeployKubernetesJob
     {
@@ -100,19 +101,22 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
     /**
      * @return DeployKubernetesJob
      * @throws JobException
+     * @throws ManifestException
      */
     private function createDeployOnGCloud(): DeployKubernetesJob
     {
         Manifest::addMetadata(Metadata::DEPLOY_TYPE_KEY, Metadata::DEPLOY_TYPE_GCLOUD);
 
         $gitlabCICommonQuestions = new GitLabCICommonQuestions($this->getAentHelper());
-
         $remoteBasePath = $gitlabCICommonQuestions->askForRemoteBasePath();
+        $kubernetesDirPath = $remoteBasePath . '/' . $this->k8sDirname;
+        $branchesModel = BranchesModel::newFromMetadata();
         $isManual = $gitlabCICommonQuestions->askForManual();
 
         return DeployKubernetesJob::newDeployOnGCloud(
             $this->envName,
-            $remoteBasePath,
+            $kubernetesDirPath,
+            $branchesModel,
             $isManual
         );
     }
@@ -125,14 +129,18 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
     private function createCleanupOnGCloud(): CleanupKubernetesJob
     {
         $gitlabCICommonQuestions = new GitLabCICommonQuestions($this->getAentHelper());
+        $registryDomainName = Manifest::mustGetMetadata(Metadata::REGISTRY_DOMAIN_NAME_KEY);
         $projectGroup = Manifest::mustGetMetadata(Metadata::PROJECT_GROUP_KEY);
         $projectName = Manifest::mustGetMetadata(Metadata::PROJECT_NAME_KEY);
+        $branchesModel = BranchesModel::newFromMetadata();
         $isManual = $gitlabCICommonQuestions->askForManual();
 
         return CleanupKubernetesJob::newCleanup(
             $this->envName,
+            $registryDomainName,
             $projectGroup,
             $projectName,
+            $branchesModel,
             $isManual
         );
     }

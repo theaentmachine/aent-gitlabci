@@ -8,6 +8,7 @@ use TheAentMachine\AentGitLabCI\Exception\JobException;
 use TheAentMachine\AentGitLabCI\Exception\PayloadException;
 use TheAentMachine\AentGitLabCI\GitLabCI\GitLabCIFile;
 use TheAentMachine\AentGitLabCI\GitLabCI\Job\DeployDockerComposeJob;
+use TheAentMachine\AentGitLabCI\GitLabCI\Job\Model\BranchesModel;
 use TheAentMachine\AentGitLabCI\Question\GitLabCICommonQuestions;
 use TheAentMachine\Aenthill\CommonEvents;
 use TheAentMachine\Aenthill\CommonMetadata;
@@ -47,7 +48,7 @@ final class NewDeployDockerComposeJobEventCommand extends AbstractEventCommand
 
         $aentHelper->title('GitLab CI: adding a deploy stage');
 
-        if (empty($payload)) {
+        if (null === $payload) {
             throw PayloadException::missingDockerComposeFilename();
         }
 
@@ -73,6 +74,7 @@ final class NewDeployDockerComposeJobEventCommand extends AbstractEventCommand
     /**
      * @return DeployDockerComposeJob
      * @throws JobException
+     * @throws ManifestException
      */
     private function askForDeployType(): DeployDockerComposeJob
     {
@@ -97,6 +99,7 @@ final class NewDeployDockerComposeJobEventCommand extends AbstractEventCommand
     /**
      * @return DeployDockerComposeJob
      * @throws JobException
+     * @throws ManifestException
      */
     private function createDeployOnRemoteServerJob(): DeployDockerComposeJob
     {
@@ -107,7 +110,7 @@ final class NewDeployDockerComposeJobEventCommand extends AbstractEventCommand
         $remoteIP = $gitlabCICommonQuestions->askForRemoteIP();
         $remoteUser = $gitlabCICommonQuestions->askForRemoteUser();
         $remoteBasePath = $gitlabCICommonQuestions->askForRemoteBasePath();
-        $branches = $gitlabCICommonQuestions->askForBranches(false);
+        $branchesModel = BranchesModel::newFromMetadata();
         $isManual = $gitlabCICommonQuestions->askForManual();
 
         return DeployDockerComposeJob::newDeployOnRemoteServer(
@@ -117,7 +120,7 @@ final class NewDeployDockerComposeJobEventCommand extends AbstractEventCommand
             $remoteIP,
             $remoteUser,
             $remoteBasePath,
-            $branches,
+            $branchesModel,
             $isManual
         );
     }
