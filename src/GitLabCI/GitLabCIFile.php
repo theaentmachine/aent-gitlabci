@@ -2,9 +2,10 @@
 
 namespace TheAentMachine\AentGitLabCI\GitLabCI;
 
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Filesystem\Filesystem;
 use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
 use TheAentMachine\AentGitLabCI\GitLabCI\Job\AbstractBuildJob;
+use TheAentMachine\AentGitLabCI\GitLabCI\Job\AbstractCleanupJob;
 use TheAentMachine\AentGitLabCI\GitLabCI\Job\AbstractDeployJob;
 use TheAentMachine\Aenthill\Pheromone;
 use TheAentMachine\Exception\MissingEnvironmentVariableException;
@@ -54,17 +55,12 @@ final class GitLabCIFile
             return $this;
         }
 
-        \file_put_contents($this->path, '');
+        $fileSystem = new Filesystem();
+        $fileSystem->dumpFile($this->path, '');
 
-        $fileOwner = \fileowner(\dirname($this->path));
-        if (!is_bool($fileOwner)) {
-            \chown($this->path, $fileOwner);
-        }
-
-        $fileGroup = \filegroup(\dirname($this->path));
-        if (!is_bool($fileGroup)) {
-            \chgrp($this->path, $fileGroup);
-        }
+        $containerProjectDirInfo = new \SplFileInfo(\dirname($this->path));
+        chown($this->path, $containerProjectDirInfo->getOwner());
+        chgrp($this->path, $containerProjectDirInfo->getGroup());
 
         $this->file = new \SplFileInfo($this->path);
 
@@ -90,7 +86,7 @@ final class GitLabCIFile
             ],
         ];
 
-        $yaml = Yaml::dump($stages, 256, 2, Yaml::DUMP_OBJECT_AS_MAP);
+        $yaml = YamlTools::dump($stages);
         \file_put_contents($this->path, $yaml);
 
         return $this;
@@ -107,7 +103,7 @@ final class GitLabCIFile
             throw GitLabCIFileException::missingFile();
         }
 
-        $yaml = Yaml::dump($job->dump(), 256, 2, Yaml::DUMP_OBJECT_AS_MAP);
+        $yaml = YamlTools::dump($job->dump());
         YamlTools::mergeContentIntoFile($yaml, $this->path);
 
         return $this;
@@ -124,7 +120,24 @@ final class GitLabCIFile
             throw GitLabCIFileException::missingFile();
         }
 
-        $yaml = Yaml::dump($job->dump(), 256, 2, Yaml::DUMP_OBJECT_AS_MAP);
+        $yaml = YamlTools::dump($job->dump());
+        YamlTools::mergeContentIntoFile($yaml, $this->path);
+
+        return $this;
+    }
+
+    /**
+     * @param AbstractCleanupJob $job
+     * @return GitLabCIFile
+     * @throws GitLabCIFileException
+     */
+    public function addCleanUp(AbstractCleanupJob $job): self
+    {
+        if (!$this->exist()) {
+            throw GitLabCIFileException::missingFile();
+        }
+
+        $yaml = YamlTools::dump($job->dump());
         YamlTools::mergeContentIntoFile($yaml, $this->path);
 
         return $this;

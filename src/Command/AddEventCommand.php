@@ -3,11 +3,16 @@
 namespace TheAentMachine\AentGitLabCI\Command;
 
 use TheAentMachine\AentGitLabCI\Aenthill\Metadata;
+use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
+use TheAentMachine\AentGitLabCI\Exception\JobException;
 use TheAentMachine\AentGitLabCI\GitLabCI\GitLabCIFile;
+use TheAentMachine\AentGitLabCI\GitLabCI\Job\Model\BranchesModel;
 use TheAentMachine\Aenthill\CommonEvents;
+use TheAentMachine\Aenthill\CommonMetadata;
 use TheAentMachine\Aenthill\Manifest;
 use TheAentMachine\Command\AbstractEventCommand;
-use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
+use TheAentMachine\Exception\ManifestException;
+use TheAentMachine\Exception\MissingEnvironmentVariableException;
 use TheAentMachine\Question\CommonValidators;
 
 final class AddEventCommand extends AbstractEventCommand
@@ -21,6 +26,7 @@ final class AddEventCommand extends AbstractEventCommand
      * @param null|string $payload
      * @return null|string
      * @throws GitLabCIFileException
+     * @throws MissingEnvironmentVariableException
      */
     protected function executeEvent(?string $payload): ?string
     {
@@ -52,7 +58,12 @@ final class AddEventCommand extends AbstractEventCommand
             Manifest::addMetadata(Metadata::PROJECT_NAME_KEY, $projectName);
         }
 
-        return null;
+        if (null === Manifest::getMetadata(CommonMetadata::SINGLE_ENVIRONMENT_KEY)) {
+            $branchesModel = $this->askForBranches((bool)$payload);
+            Manifest::addMetadata(CommonMetadata::SINGLE_ENVIRONMENT_KEY, (string)!$branchesModel->isSingleBranch());
+        }
+
+        return Manifest::getMetadata(CommonMetadata::SINGLE_ENVIRONMENT_KEY);
     }
 
     private function askForRegistryDomainName(): string
@@ -80,5 +91,72 @@ final class AddEventCommand extends AbstractEventCommand
             ->compulsory()
             ->setValidator(CommonValidators::getAlphaValidator(['-']))
             ->ask();
+    }
+
+    private function askForBranches(bool $forSingleEnvironment = false): BranchesModel
+    {
+        try {
+            $branchesModel = BranchesModel::newFromMetadata();
+            return $branchesModel;
+        } catch (ManifestException | JobException $e) {
+            if ($forSingleEnvironment) {
+                $branch = $this->askForBranch(true);
+                return new BranchesModel([$branch], []);
+            }
+            $singleBranch = 'On one single branch';
+            $allBranches = 'On all branches';
+            $customBranches = 'Choose custom branches';
+            $choices = [$singleBranch, $allBranches, $customBranches];
+            $strategy = $this->getAentHelper()->choiceQuestion('Which deployment strategy to you want to apply?', $choices)
+                ->ask();
+
+            $branches = [];
+            $branchesToIgnore = [];
+            switch ($strategy) {
+                case $singleBranch:
+                    $branches[] = $this->askForBranch(true);
+                    break;
+                case $allBranches:
+                    $branches[] = 'branches';
+                    break;
+                case $customBranches:
+                    $branches[] = $this->askForBranch(true);
+                    do {
+                        $anotherBranch = $this->askForBranch(false);
+                        if (!empty($anotherBranch)) {
+                            $branches[] = $anotherBranch;
+                        }
+                    } while (!empty($anotherBranch));
+                    break;
+            }
+
+            if ($strategy !== $singleBranch) {
+                do {
+                    $branchToIgnore = $this->getAentHelper()->question('Git branch to ignore (leave empty to skip)')
+                        ->setDefault('')
+                        ->setValidator(CommonValidators::getAlphaValidator(['_', '.', '-'], 'branch names can contain alphanumeric characters and "_", ".", "-".'))
+                        ->ask();
+                    if (!empty($branchToIgnore)) {
+                        $branchesToIgnore[] = $branchToIgnore;
+                    }
+                } while (!empty($branchToIgnore));
+            }
+
+            $branchesModel = new BranchesModel($branches, $branchesToIgnore);
+            $branchesModel->feedMetadata();
+            return $branchesModel;
+        }
+    }
+
+    private function askForBranch(bool $compulsory = true): string
+    {
+        $questionText = $compulsory ? 'Git branch' : 'Git branch (leave empty to skip)';
+        $question = $this->getAentHelper()->question($questionText)
+            ->setDefault('')
+            ->setValidator(CommonValidators::getAlphaValidator(['_', '.', '-'], 'branch names can contain alphanumeric characters and "_", ".", "-".'));
+        if ($compulsory) {
+            $question->compulsory();
+        }
+        return $question->ask();
     }
 }

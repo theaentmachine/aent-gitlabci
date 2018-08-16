@@ -3,11 +3,12 @@
 namespace TheAentMachine\AentGitLabCI\Command;
 
 use TheAentMachine\AentGitLabCI\Aenthill\Metadata;
-use TheAentMachine\AentGitLabCI\Exception\PayloadException;
 use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
 use TheAentMachine\AentGitLabCI\Exception\JobException;
+use TheAentMachine\AentGitLabCI\Exception\PayloadException;
 use TheAentMachine\AentGitLabCI\GitLabCI\GitLabCIFile;
 use TheAentMachine\AentGitLabCI\GitLabCI\Job\BuildDockerfileJob;
+use TheAentMachine\AentGitLabCI\GitLabCI\Job\Model\BranchesModel;
 use TheAentMachine\Aenthill\CommonEvents;
 use TheAentMachine\Aenthill\CommonMetadata;
 use TheAentMachine\Aenthill\Manifest;
@@ -34,14 +35,13 @@ final class NewBuildImageJobCommand extends AbstractJsonEventCommand
     protected function executeJsonEvent(array $payload): ?array
     {
         $aentHelper = $this->getAentHelper();
-        $aentHelper->title("GitLab CI: adding a build stage");
+        $aentHelper->title('GitLab CI: adding a build stage');
 
-        // TODO handle many branches
         $envName = Manifest::mustGetMetadata(CommonMetadata::ENV_NAME_KEY);
         $registryDomainName = Manifest::mustGetMetadata(Metadata::REGISTRY_DOMAIN_NAME_KEY);
         $projectGroup = Manifest::mustGetMetadata(Metadata::PROJECT_GROUP_KEY);
         $projectName = Manifest::mustGetMetadata(Metadata::PROJECT_NAME_KEY);
-        $branch = Manifest::mustGetMetadata(Metadata::BRANCH_KEY);
+        $branchesModel = BranchesModel::newFromMetadata();
 
         $this->validatePayload($payload);
         $serviceName = $payload['serviceName'];
@@ -57,7 +57,7 @@ final class NewBuildImageJobCommand extends AbstractJsonEventCommand
             $registryDomainName,
             $projectGroup,
             $projectName,
-            $branch
+            $branchesModel
         );
 
         $file = new GitLabCIFile();
@@ -67,7 +67,6 @@ final class NewBuildImageJobCommand extends AbstractJsonEventCommand
         $this->output->writeln('🦊 <info>' . GitLabCIFile::DEFAULT_FILENAME . '</info> has been successfully updated!');
 
         return [
-            'variableEnvironment' => $job->isVariableEnvironment(),
             'dockerImageName' => $job->getDockerImageName()
         ];
     }

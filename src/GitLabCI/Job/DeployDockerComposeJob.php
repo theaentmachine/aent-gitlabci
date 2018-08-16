@@ -8,10 +8,6 @@ use TheAentMachine\AentGitLabCI\GitLabCI\Job\Model\BranchesModel;
 
 final class DeployDockerComposeJob extends AbstractDeployJob
 {
-    public function __construct(string $identifier)
-    {
-        parent::__construct($identifier);
-    }
 
     /**
      * @param string $identifier
@@ -20,14 +16,14 @@ final class DeployDockerComposeJob extends AbstractDeployJob
      * @param string $remoteIP
      * @param string $remoteUser
      * @param string $remoteBasePath
-     * @param BranchesModel $branches
+     * @param BranchesModel $branchesModel
      * @param bool $isManual
      * @return DeployDockerComposeJob
      * @throws JobException
      */
-    public static function newDeployOnRemoteServer(string $identifier, string $registryDomainName, string $dockerComposeFilename, string $remoteIP, string $remoteUser, string $remoteBasePath, BranchesModel $branches, bool $isManual): self
+    public static function newDeployOnRemoteServer(string $identifier, string $registryDomainName, string $dockerComposeFilename, string $remoteIP, string $remoteUser, string $remoteBasePath, BranchesModel $branchesModel, bool $isManual): self
     {
-        $self = new DeployDockerComposeJob($identifier);
+        $self = new self($identifier);
 
         $self->image = 'kroniak/ssh-client:3.6';
         $self->variables = [
@@ -40,6 +36,7 @@ final class DeployDockerComposeJob extends AbstractDeployJob
             'REMOTE_BASE_PATH' => $remoteBasePath,
         ];
         $self->script = [
+            'sed -e "s/#ENVIRONMENT#/${CI_COMMIT_REF_SLUG}/g" ${DOCKER_COMPOSE_FILENAME} > ${DOCKER_COMPOSE_FILENAME}',
             'mkdir ~/.ssh',
             'echo "${SSH_KNOWN_HOSTS}" >> ~/.ssh/known_hosts',
             'chmod 644 ~/.ssh/known_hosts',
@@ -52,12 +49,12 @@ final class DeployDockerComposeJob extends AbstractDeployJob
             'ssh ${REMOTE_USER}@${REMOTE_IP} "cd ${REMOTE_BASE_PATH} && docker-compose up -d"'
         ];
 
-        $branch = $branches->getBranch();
-        if (empty($branch)) {
-            throw JobException::branchIsNull();
+        foreach ($branchesModel->getBranches() as $branch) {
+            $self->addOnly($branch);
         }
-
-        $self->addOnly($branch);
+        foreach ($branchesModel->getBranchesToIgnore() as $branch) {
+            $self->addExcept($branch);
+        }
         $self->manual = $isManual;
 
         return $self;

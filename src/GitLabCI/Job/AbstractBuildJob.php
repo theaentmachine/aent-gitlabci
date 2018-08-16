@@ -6,8 +6,7 @@ namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 abstract class AbstractBuildJob extends AbstractJob
 {
     /** @var bool */
-    protected $isVariableEnvironment;
-
+    protected $isSingleBranch;
     /** @var string */
     protected $dockerImageName;
 
@@ -17,17 +16,11 @@ abstract class AbstractBuildJob extends AbstractJob
         $this->stage = 'build';
     }
 
-    /**
-     * @return bool
-     */
-    public function isVariableEnvironment(): bool
+    public function isSingleBranch(): bool
     {
-        return $this->isVariableEnvironment;
+        return $this->isSingleBranch;
     }
 
-    /**
-     * @return string
-     */
     public function getDockerImageName(): string
     {
         return $this->dockerImageName;
