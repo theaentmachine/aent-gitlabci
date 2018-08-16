@@ -27,7 +27,7 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
     private $registryDomainName;
 
     /** @var string */
-    private $k8sDirname;
+    private $k8sDirName;
 
     protected function getEventName(): string
     {
@@ -35,7 +35,7 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
     }
 
     /**
-     * @param null|string $payload
+     * @param null|string $k8sDirName
      * @return null|string
      * @throws GitLabCIFileException
      * @throws JobException
@@ -43,21 +43,21 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
      * @throws MissingEnvironmentVariableException
      * @throws PayloadException
      */
-    protected function executeEvent(?string $payload): ?string
+    protected function executeEvent(?string $k8sDirName): ?string
     {
         $aentHelper = $this->getAentHelper();
 
         $aentHelper->title('GitLab CI: adding a deploy stage');
 
-        if (null === $payload) {
+        if (null === $k8sDirName) {
             throw PayloadException::missingKubernetesPathname();
         }
 
         $this->envName = Manifest::mustGetMetadata(CommonMetadata::ENV_NAME_KEY);
         $this->registryDomainName = Manifest::mustGetMetadata(Metadata::REGISTRY_DOMAIN_NAME_KEY);
-        $this->k8sDirname = $payload;
+        $this->k8sDirName = $k8sDirName;
 
-        $this->output->writeln("🦊×☸️ Kubernetes folder: <info>$this->k8sDirname</info>");
+        $this->output->writeln("🦊×☸️ Kubernetes folder: <info>$this->k8sDirName</info>");
         $aentHelper->spacer();
 
         $deployJob = $this->askForDeployType();
@@ -108,14 +108,12 @@ final class NewDeployKubernetesJobEventCommand extends AbstractEventCommand
         Manifest::addMetadata(Metadata::DEPLOY_TYPE_KEY, Metadata::DEPLOY_TYPE_GCLOUD);
 
         $gitlabCICommonQuestions = new GitLabCICommonQuestions($this->getAentHelper());
-        $remoteBasePath = $gitlabCICommonQuestions->askForRemoteBasePath();
-        $kubernetesDirPath = $remoteBasePath . '/' . $this->k8sDirname;
         $branchesModel = BranchesModel::newFromMetadata();
         $isManual = $gitlabCICommonQuestions->askForManual();
 
         return DeployKubernetesJob::newDeployOnGCloud(
             $this->envName,
-            $kubernetesDirPath,
+            $this->k8sDirName,
             $branchesModel,
             $isManual
         );
