@@ -13,7 +13,7 @@ final class Metadata
     public const REMOTE_IP_KEY = 'REMOTE_IP';
     public const REMOTE_USER_KEY = 'REMOTE_USER';
     public const REMOTE_BASE_PATH_KEY = 'REMOTE_BASE_PATH';
-    public const BRANCH_KEY = 'BRANCH';
+    public const BRANCHES_KEY = 'BRANCHES';
     public const BRANCHES_TO_IGNORE_KEY = 'BRANCHES_TO_IGNORE';
     public const IS_MANUAL_KEY = 'IS_MANUAL';
     public const KUBERNETES_DIR_PATH_KEY = 'KUBERNETES_DIR_PATH';
