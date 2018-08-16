@@ -40,9 +40,7 @@ abstract class AbstractJob
     /** @var bool */
     protected $manual = false;
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function dump(): array
     {
         $obj = [

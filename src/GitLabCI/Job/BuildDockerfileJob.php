@@ -22,8 +22,8 @@ class BuildDockerfileJob extends AbstractBuildJob
     {
         parent::__construct($envName, $serviceName);
 
-        $this->isVariableEnvironment = $branchesModel->isMultipleBranches();
-        $tag = $this->isVariableEnvironment ? '#ENVIRONMENT#' : strtolower($branchesModel->getBranches()[0]);
+        $this->isSingleBranch = $branchesModel->isSingleBranch();
+        $tag = $this->isSingleBranch ? strtolower($branchesModel->getBranches()[0]) : '#ENVIRONMENT#';
         $this->dockerImageName = "$registryDomainName/$projectGroup/$projectName:$tag";
 
         $this->image = 'docker:git';
@@ -35,7 +35,7 @@ class BuildDockerfileJob extends AbstractBuildJob
             'PROJECT_NAME' => $projectName
         ];
 
-        $scriptTag = $this->isVariableEnvironment ? '${CI_COMMIT_REF_SLUG}' : strtolower($branchesModel->getBranches()[0]);
+        $scriptTag = $this->isSingleBranch ? strtolower($branchesModel->getBranches()[0]) : '${CI_COMMIT_REF_SLUG}';
         $this->script = [
             'docker login -u ${CI_DEPLOY_USER} -p ${CI_DEPLOY_PASSWORD} ${REGISTRY_DOMAIN_NAME}',
             'docker build -t ${REGISTRY_DOMAIN_NAME}/${PROJECT_GROUP}/${PROJECT_NAME}:' . $scriptTag . ' .',

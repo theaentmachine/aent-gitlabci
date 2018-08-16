@@ -36,6 +36,7 @@ final class DeployDockerComposeJob extends AbstractDeployJob
             'REMOTE_BASE_PATH' => $remoteBasePath,
         ];
         $self->script = [
+            'sed -e "s/#ENVIRONMENT#/${CI_COMMIT_REF_SLUG}/g" ${DOCKER_COMPOSE_FILENAME} > ${DOCKER_COMPOSE_FILENAME}',
             'mkdir ~/.ssh',
             'echo "${SSH_KNOWN_HOSTS}" >> ~/.ssh/known_hosts',
             'chmod 644 ~/.ssh/known_hosts',

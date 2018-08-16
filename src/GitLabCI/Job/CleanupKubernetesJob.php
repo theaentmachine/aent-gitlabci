@@ -33,7 +33,7 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
             'PROJECT_GROUP' => $projectGroup,
             'PROJECT_NAME' => $projectName
         ];
-        $scriptTag = $branchesModel->isMultipleBranches() ? '${CI_COMMIT_REF_SLUG}' : strtolower($branchesModel->getBranches()[0]);
+        $scriptTag = $branchesModel->isSingleBranch() ? strtolower($branchesModel->getBranches()[0]) : '${CI_COMMIT_REF_SLUG}';
         $self->script = [
             'delete_image.sh ${REGISTRY_DOMAIN_NAME}/${PROJECT_GROUP}/${PROJECT_NAME}:' . $scriptTag,
             'echo $GCLOUD_SERVICE_KEY_BASE64 | base64 -d > /secret.json',

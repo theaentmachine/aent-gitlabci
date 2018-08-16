@@ -27,7 +27,6 @@ final class AddEventCommand extends AbstractEventCommand
      * @return null|string
      * @throws GitLabCIFileException
      * @throws MissingEnvironmentVariableException
-     * @throws JobException
      */
     protected function executeEvent(?string $payload): ?string
     {
@@ -59,12 +58,12 @@ final class AddEventCommand extends AbstractEventCommand
             Manifest::addMetadata(Metadata::PROJECT_NAME_KEY, $projectName);
         }
 
-        if (null === Manifest::getMetadata(CommonMetadata::IS_VARIABLE_ENVIRONMENT)) {
-            $branchesModel = $this->askForBranches();
-            Manifest::addMetadata(CommonMetadata::IS_VARIABLE_ENVIRONMENT, (string)$branchesModel->isMultipleBranches());
+        if (null === Manifest::getMetadata(CommonMetadata::SINGLE_ENVIRONMENT_KEY)) {
+            $branchesModel = $this->askForBranches((bool)$payload);
+            Manifest::addMetadata(CommonMetadata::SINGLE_ENVIRONMENT_KEY, (string)!$branchesModel->isSingleBranch());
         }
 
-        return Manifest::getMetadata(CommonMetadata::IS_VARIABLE_ENVIRONMENT);
+        return Manifest::getMetadata(CommonMetadata::SINGLE_ENVIRONMENT_KEY);
     }
 
     private function askForRegistryDomainName(): string
@@ -94,16 +93,16 @@ final class AddEventCommand extends AbstractEventCommand
             ->ask();
     }
 
-    /**
-     * @return BranchesModel
-     * @throws JobException
-     */
-    private function askForBranches(): BranchesModel
+    private function askForBranches(bool $forSingleEnvironment = false): BranchesModel
     {
         try {
             $branchesModel = BranchesModel::newFromMetadata();
             return $branchesModel;
         } catch (ManifestException | JobException $e) {
+            if ($forSingleEnvironment) {
+                $branch = $this->askForBranch(true);
+                return new BranchesModel([$branch], []);
+            }
             $singleBranch = 'On one single branch';
             $allBranches = 'On all branches';
             $customBranches = 'Choose custom branches';

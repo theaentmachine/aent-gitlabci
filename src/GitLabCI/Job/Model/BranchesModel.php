@@ -54,10 +54,9 @@ final class BranchesModel
         }
     }
 
-    public function isMultipleBranches(): bool
+    public function isSingleBranch(): bool
     {
-        $branchesCount = count($this->branches);
-        return $branchesCount > 1 || ($branchesCount === 1 && $this->branches[0] === 'branches');
+        return (count($this->branches) === 1 && $this->branches[0] !== 'branches');
     }
 
     /**
