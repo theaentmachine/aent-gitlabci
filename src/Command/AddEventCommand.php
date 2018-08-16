@@ -23,12 +23,12 @@ final class AddEventCommand extends AbstractEventCommand
     }
 
     /**
-     * @param null|string $payload
+     * @param null|string $isForSingleEnv
      * @return null|string
      * @throws GitLabCIFileException
      * @throws MissingEnvironmentVariableException
      */
-    protected function executeEvent(?string $payload): ?string
+    protected function executeEvent(?string $isForSingleEnv): ?string
     {
         $aentHelper = $this->getAentHelper();
         $aentHelper->title('Installing GitLab CI file');
@@ -59,7 +59,7 @@ final class AddEventCommand extends AbstractEventCommand
         }
 
         if (null === Manifest::getMetadata(CommonMetadata::SINGLE_ENVIRONMENT_KEY)) {
-            $branchesModel = $this->askForBranches((bool)$payload);
+            $branchesModel = $this->askForBranches((bool)$isForSingleEnv);
             Manifest::addMetadata(CommonMetadata::SINGLE_ENVIRONMENT_KEY, (string)!$branchesModel->isSingleBranch());
         }
 

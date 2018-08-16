@@ -10,13 +10,13 @@ final class DeployKubernetesJob extends AbstractDeployJob
 {
     /**
      * @param string $identifier
-     * @param string $kubernetesDirPath
+     * @param string $k8sDirName
      * @param BranchesModel $branchesModel
      * @param bool $isManual
      * @return DeployKubernetesJob
      * @throws JobException
      */
-    public static function newDeployOnGCloud(string $identifier, string $kubernetesDirPath, BranchesModel $branchesModel, bool $isManual): self
+    public static function newDeployOnGCloud(string $identifier, string $k8sDirName, BranchesModel $branchesModel, bool $isManual): self
     {
         $self = new self($identifier);
 
@@ -27,7 +27,7 @@ final class DeployKubernetesJob extends AbstractDeployJob
             'GKE_CLUSTER' => 'You should put this value in your secrets CI variables!',
             'ZONE' => 'You should put this value in your secrets CI variables!',
             'KUBECONFIG' => '/root/.kube/config',
-            'KUBERNETES_DIR_PATH' => $kubernetesDirPath,
+            'K8S_DIRNAME' => $k8sDirName,
         ];
         $self->script = [
             'echo $GCLOUD_SERVICE_KEY_BASE64 | base64 -d > /secret.json',
@@ -37,7 +37,7 @@ final class DeployKubernetesJob extends AbstractDeployJob
             'chmod +x /kubectl',
             '/kubectl create namespace ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} || true',
             '/kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} delete all --all',
-            'cd ${KUBERNETES_DIR_PATH}',
+            'cd ${K8S_DIRNAME}',
             'for template_file in $(find . -type f -name "*.template"); do sed -e "s/#ENVIRONMENT#/${CI_COMMIT_REF_SLUG}/g" $template_file > ${template_file::-9}; done',
             'for yml_file in $(find . -type f -name "*.yml" -or -name "*.yaml"); do /kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} apply -f yml_file; done'
         ];
