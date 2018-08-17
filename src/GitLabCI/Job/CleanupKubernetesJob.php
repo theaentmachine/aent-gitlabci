@@ -40,9 +40,8 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
             'gcloud auth activate-service-account --key-file /secret.json',
             'gcloud config set project $GCLOUD_PROJECT',
             'gcloud container clusters get-credentials $GKE_CLUSTER --zone $ZONE --project $GCLOUD_PROJECT',
-            'chmod +x /kubectl',
-            '/kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} delete all --all',
-            '/kubectl delete namespace ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG}',
+            'kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} delete all --all',
+            'kubectl delete namespace ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG}',
         ];
 
         foreach ($branchesModel->getBranches() as $branch) {
@@ -82,8 +81,8 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
             '/delete_image.sh ${REGISTRY_DOMAIN_NAME}/${PROJECT_GROUP}/${PROJECT_NAME}:' . $scriptTag,
             'mkdir ~/.kube',
             'echo "$KUBE_CONFIG" > ~/.kube/config',
-            '/kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} delete all --all',
-            '/kubectl delete namespace ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG}',
+            'kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} delete all --all',
+            'kubectl delete namespace ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG}',
         ];
 
         foreach ($branchesModel->getBranches() as $branch) {
