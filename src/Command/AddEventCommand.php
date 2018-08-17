@@ -60,7 +60,7 @@ final class AddEventCommand extends AbstractEventCommand
 
         if (null === Manifest::getMetadata(CommonMetadata::SINGLE_ENVIRONMENT_KEY)) {
             $branchesModel = $this->askForBranches((bool)$isForSingleEnv);
-            Manifest::addMetadata(CommonMetadata::SINGLE_ENVIRONMENT_KEY, (string)!$branchesModel->isSingleBranch());
+            Manifest::addMetadata(CommonMetadata::SINGLE_ENVIRONMENT_KEY, (string)$branchesModel->isSingleBranch());
         }
 
         return Manifest::getMetadata(CommonMetadata::SINGLE_ENVIRONMENT_KEY);
