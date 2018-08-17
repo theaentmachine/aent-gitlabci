@@ -57,6 +57,7 @@ final class NewBuildImageJobCommand extends AbstractJsonEventCommand
             $registryDomainName,
             $projectGroup,
             $projectName,
+            $dockerfileName,
             $branchesModel
         );
 

@@ -189,16 +189,16 @@
         },
         {
             "name": "opis/json-schema",
-            "version": "1.0.9",
+            "version": "1.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/opis/json-schema.git",
-                "reference": "89562ccff7864a9c952bd9f4219197068f612ba5"
+                "reference": "43ba67ae53ac7b3ba5e5ab4a1e1c75629a3031fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/opis/json-schema/zipball/89562ccff7864a9c952bd9f4219197068f612ba5",
-                "reference": "89562ccff7864a9c952bd9f4219197068f612ba5",
+                "url": "https://api.github.com/repos/opis/json-schema/zipball/43ba67ae53ac7b3ba5e5ab4a1e1c75629a3031fc",
+                "reference": "43ba67ae53ac7b3ba5e5ab4a1e1c75629a3031fc",
                 "shasum": ""
             },
             "require": {
@@ -247,7 +247,7 @@
                 "validation",
                 "validator"
             ],
-            "time": "2018-05-23T10:46:08+00:00"
+            "time": "2018-08-16T18:47:56+00:00"
         },
         {
             "name": "psr/http-message",

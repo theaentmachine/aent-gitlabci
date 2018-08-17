@@ -18,7 +18,7 @@ class BuildDockerfileJob extends AbstractBuildJob
      * @param BranchesModel $branchesModel
      * @throws JobException
      */
-    public function __construct(string $envName, string $serviceName, string $registryDomainName, string $projectGroup, string $projectName, BranchesModel $branchesModel)
+    public function __construct(string $envName, string $serviceName, string $registryDomainName, string $projectGroup, string $projectName, string $dockerfileName, BranchesModel $branchesModel)
     {
         parent::__construct($envName, $serviceName);
 
@@ -32,13 +32,14 @@ class BuildDockerfileJob extends AbstractBuildJob
             'DOCKER_DRIVER' => 'overlay2',
             'REGISTRY_DOMAIN_NAME' => $registryDomainName,
             'PROJECT_GROUP' => $projectGroup,
-            'PROJECT_NAME' => $projectName
+            'PROJECT_NAME' => $projectName,
+            'DOCKERFILE_NAME' => $dockerfileName
         ];
 
         $scriptTag = $this->isSingleBranch ? strtolower($branchesModel->getBranches()[0]) : '${CI_COMMIT_REF_SLUG}';
         $this->script = [
             'docker login -u ${CI_DEPLOY_USER} -p ${CI_DEPLOY_PASSWORD} ${REGISTRY_DOMAIN_NAME}',
-            'docker build -t ${REGISTRY_DOMAIN_NAME}/${PROJECT_GROUP}/${PROJECT_NAME}:' . $scriptTag . ' .',
+            'docker build -t ${REGISTRY_DOMAIN_NAME}/${PROJECT_GROUP}/${PROJECT_NAME}:' . $scriptTag . ' -f ${DOCKERFILE_NAME} .',
             'docker push ${REGISTRY_DOMAIN_NAME}/${PROJECT_GROUP}/${PROJECT_NAME}:' . $scriptTag
         ];
 
