@@ -39,7 +39,7 @@ final class DeployKubernetesJob extends AbstractDeployJob
             '/kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} delete all --all',
             'cd ${K8S_DIRNAME}',
             'for template_file in $(find . -type f -name "*.template"); do sed -e "s/#ENVIRONMENT#/${CI_COMMIT_REF_SLUG}/g" $template_file > ${template_file::-9}; done',
-            'for yml_file in $(find . -type f -name "*.yml" -or -name "*.yaml"); do /kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} apply -f yml_file; done'
+            'for yml_file in $(find . -type f -name "*.yml" -or -name "*.yaml"); do /kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} apply -f ${yml_file}; done'
         ];
 
         foreach ($branchesModel->getBranches() as $branch) {
@@ -78,7 +78,7 @@ final class DeployKubernetesJob extends AbstractDeployJob
             'cd ${K8S_DIRNAME}',
             // TODO: add a docker-registry secret?
             'for template_file in $(find . -type f -name "*.template"); do sed -e "s/#ENVIRONMENT#/${CI_COMMIT_REF_SLUG}/g" $template_file > ${template_file::-9}; done',
-            'for yml_file in $(find . -type f -name "*.yml" -or -name "*.yaml"); do kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} apply -f yml_file; done'
+            'for yml_file in $(find . -type f -name "*.yml" -or -name "*.yaml"); do kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} apply -f ${yml_file}; done'
         ];
 
         foreach ($branchesModel->getBranches() as $branch) {
