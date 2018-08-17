@@ -78,11 +78,11 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
         ];
         $scriptTag = $branchesModel->isSingleBranch() ? strtolower($branchesModel->getBranches()[0]) : '${CI_COMMIT_REF_SLUG}';
         $self->script = [
-            '/delete_image.sh ${REGISTRY_DOMAIN_NAME}/${PROJECT_GROUP}/${PROJECT_NAME}:' . $scriptTag,
             'mkdir ~/.kube',
             'echo "$KUBE_CONFIG" > ~/.kube/config',
             'kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} delete all --all',
             'kubectl delete namespace ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG}',
+            '/delete_image.sh ${REGISTRY_DOMAIN_NAME}/${PROJECT_GROUP}/${PROJECT_NAME}:' . $scriptTag,
         ];
 
         foreach ($branchesModel->getBranches() as $branch) {
