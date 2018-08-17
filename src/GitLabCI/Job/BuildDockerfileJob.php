@@ -38,7 +38,7 @@ class BuildDockerfileJob extends AbstractBuildJob
 
         $scriptTag = $this->isSingleBranch ? strtolower($branchesModel->getBranches()[0]) : '${CI_COMMIT_REF_SLUG}';
         $this->script = [
-            'docker login -u ${CI_DEPLOY_USER} -p ${CI_DEPLOY_PASSWORD} ${REGISTRY_DOMAIN_NAME}',
+            'docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${REGISTRY_DOMAIN_NAME}',
             'docker build -t ${REGISTRY_DOMAIN_NAME}/${PROJECT_GROUP}/${PROJECT_NAME}:' . $scriptTag . ' -f ${DOCKERFILE_NAME} .',
             'docker push ${REGISTRY_DOMAIN_NAME}/${PROJECT_GROUP}/${PROJECT_NAME}:' . $scriptTag
         ];
