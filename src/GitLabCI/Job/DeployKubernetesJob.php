@@ -1,6 +1,5 @@
 <?php
 
-
 namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 
 use TheAentMachine\AentGitLabCI\Exception\JobException;
@@ -19,7 +18,6 @@ final class DeployKubernetesJob extends AbstractDeployJob
     public static function newDeployOnGCloud(string $identifier, string $k8sDirName, BranchesModel $branchesModel, bool $isManual): self
     {
         $self = new self($identifier);
-
         $self->image = 'thecodingmachine/k8s-gitlabci:latest';
         $self->variables = [
             'GCLOUD_SERVICE_KEY_BASE64' => 'You should put this value in your secrets CI variables!',
@@ -40,7 +38,6 @@ final class DeployKubernetesJob extends AbstractDeployJob
             'for template_file in $(find . -type f -name "*.template"); do sed -e "s/#ENVIRONMENT#/${CI_COMMIT_REF_SLUG}/g" $template_file > ${template_file::-9}; done',
             'for yml_file in $(find . -type f -name "*.yml" -or -name "*.yaml"); do kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} apply -f ${yml_file}; done'
         ];
-
         foreach ($branchesModel->getBranches() as $branch) {
             $self->addOnly($branch);
         }
@@ -48,7 +45,6 @@ final class DeployKubernetesJob extends AbstractDeployJob
             $self->addExcept($branch);
         }
         $self->manual = $isManual;
-
         return $self;
     }
 
@@ -63,7 +59,6 @@ final class DeployKubernetesJob extends AbstractDeployJob
     public static function newDeployOnRancher(string $identifier, string $k8sDirName, BranchesModel $branchesModel, bool $isManual): self
     {
         $self = new self($identifier);
-
         $self->image = 'lwolf/kubectl_deployer:latest';
         $self->variables = [
             'KUBECONFIG' => '/root/.kube/config',
@@ -79,7 +74,6 @@ final class DeployKubernetesJob extends AbstractDeployJob
             'for template_file in $(find . -type f -name "*.template"); do sed -e "s/#ENVIRONMENT#/${CI_COMMIT_REF_SLUG}/g" $template_file > ${template_file::-9}; done',
             'for yml_file in $(find . -type f -name "*.yml" -or -name "*.yaml"); do kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} apply -f ${yml_file}; done'
         ];
-
         foreach ($branchesModel->getBranches() as $branch) {
             $self->addOnly($branch);
         }
@@ -87,7 +81,6 @@ final class DeployKubernetesJob extends AbstractDeployJob
             $self->addExcept($branch);
         }
         $self->manual = $isManual;
-
         return $self;
     }
 }

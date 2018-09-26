@@ -1,6 +1,5 @@
 <?php
 
-
 namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 
 use TheAentMachine\AentGitLabCI\Exception\JobException;
@@ -21,7 +20,6 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
     public static function newCleanupForGCloud(string $identifier, string $registryDomainName, string $projectGroup, string $projectName, BranchesModel $branchesModel, bool $isManual): self
     {
         $self = new self($identifier);
-
         $self->image = 'thecodingmachine/k8s-gitlabci:latest';
         $self->variables = [
             'GCLOUD_SERVICE_KEY_BASE64' => 'You should put this value in your secrets CI variables!',
@@ -43,7 +41,6 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
             'kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} delete all --all',
             'kubectl delete namespace ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG}',
         ];
-
         foreach ($branchesModel->getBranches() as $branch) {
             $self->addOnly($branch);
         }
@@ -51,7 +48,6 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
             $self->addExcept($branch);
         }
         $self->manual = $isManual;
-
         return $self;
     }
 
@@ -68,7 +64,6 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
     public static function newCleanupForRancher(string $identifier, string $registryDomainName, string $projectGroup, string $projectName, BranchesModel $branchesModel, bool $isManual): self
     {
         $self = new self($identifier);
-
         $self->image = 'thecodingmachine/gitlab-registry-cleaner:latest';
         $self->variables = [
             'KUBECONFIG' => '/root/.kube/config',
@@ -84,7 +79,6 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
             'kubectl delete namespace ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG}',
             '/delete_image.sh ${REGISTRY_DOMAIN_NAME}/${PROJECT_GROUP}/${PROJECT_NAME}:' . $scriptTag,
         ];
-
         foreach ($branchesModel->getBranches() as $branch) {
             $self->addOnly($branch);
         }
@@ -92,7 +86,6 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
             $self->addExcept($branch);
         }
         $self->manual = $isManual;
-
         return $self;
     }
 }

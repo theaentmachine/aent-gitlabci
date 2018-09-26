@@ -3,17 +3,9 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use TheAentMachine\AentApplication;
-use TheAentMachine\AentGitLabCI\Command\AddEventCommand;
-use TheAentMachine\AentGitLabCI\Command\NewBuildImageJobCommand;
-use TheAentMachine\AentGitLabCI\Command\NewDeployDockerComposeJobEventCommand;
-use TheAentMachine\AentGitLabCI\Command\NewDeployKubernetesJobEventCommand;
+use \TheAentMachine\Aent\CIAent;
+use \TheAentMachine\AentGitLabCI\Event\ConfigureCIEvent;
+use \TheAentMachine\AentGitLabCI\Event\DockerComposeDeployJobEvent;
 
-$application = new AentApplication();
-
-$application->add(new AddEventCommand());
-$application->add(new NewBuildImageJobCommand());
-$application->add(new NewDeployDockerComposeJobEventCommand());
-$application->add(new NewDeployKubernetesJobEventCommand());
-
+$application = new CIAent('GitLab', new ConfigureCIEvent(), new DockerComposeDeployJobEvent());
 $application->run();

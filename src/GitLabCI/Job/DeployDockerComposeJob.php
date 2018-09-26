@@ -1,42 +1,36 @@
 <?php
 
-
 namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 
+use TheAentMachine\AentGitLabCI\Context\BaseGitLabCIContext;
 use TheAentMachine\AentGitLabCI\Exception\JobException;
-use TheAentMachine\AentGitLabCI\GitLabCI\Job\Model\BranchesModel;
 
 final class DeployDockerComposeJob extends AbstractDeployJob
 {
-
     /**
-     * @param string $identifier
-     * @param string $registryDomainName
      * @param string $dockerComposeFilename
+     * @param BaseGitLabCIContext $context
      * @param string $remoteIP
      * @param string $remoteUser
      * @param string $remoteBasePath
-     * @param BranchesModel $branchesModel
      * @param bool $isManual
      * @return DeployDockerComposeJob
      * @throws JobException
      */
-    public static function newDeployOnRemoteServer(string $identifier, string $registryDomainName, string $dockerComposeFilename, string $remoteIP, string $remoteUser, string $remoteBasePath, BranchesModel $branchesModel, bool $isManual): self
+    public static function newDeployOnRemoteServer(string $dockerComposeFilename, BaseGitLabCIContext $context, string $remoteIP, string $remoteUser, string $remoteBasePath, bool $isManual): self
     {
-        $self = new self($identifier);
-
+        $self = new self($context->getEnvironmentName());
         $self->image = 'kroniak/ssh-client:3.6';
         $self->variables = [
             'SSH_KNOWN_HOSTS' => 'You should put this value in your secrets CI variables!',
             'SSH_PRIVATE_KEY' => 'You should put this value in your secrets CI variables!',
             'DOCKER_COMPOSE_FILENAME' => $dockerComposeFilename,
-            'REGISTRY_DOMAIN_NAME' => $registryDomainName,
+            'REGISTRY_DOMAIN_NAME' => $context->getRegistryDomainName(),
             'REMOTE_IP' => $remoteIP,
             'REMOTE_USER' => $remoteUser,
             'REMOTE_BASE_PATH' => $remoteBasePath,
         ];
         $self->script = [
-            'sed -e "s/#ENVIRONMENT#/${CI_COMMIT_REF_SLUG}/g" ${DOCKER_COMPOSE_FILENAME} > ${DOCKER_COMPOSE_FILENAME}',
             'mkdir ~/.ssh',
             'echo "${SSH_KNOWN_HOSTS}" >> ~/.ssh/known_hosts',
             'chmod 644 ~/.ssh/known_hosts',
@@ -48,7 +42,7 @@ final class DeployDockerComposeJob extends AbstractDeployJob
             'scp ${DOCKER_COMPOSE_FILENAME} ${REMOTE_USER}@${REMOTE_IP}:${REMOTE_BASE_PATH}/docker-compose.yml',
             'ssh ${REMOTE_USER}@${REMOTE_IP} "cd ${REMOTE_BASE_PATH} && docker-compose up -d"'
         ];
-
+        $branchesModel = $context->getBranchesModel();
         foreach ($branchesModel->getBranches() as $branch) {
             $self->addOnly($branch);
         }
@@ -56,7 +50,6 @@ final class DeployDockerComposeJob extends AbstractDeployJob
             $self->addExcept($branch);
         }
         $self->manual = $isManual;
-
         return $self;
     }
 }
