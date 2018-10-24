@@ -88,6 +88,9 @@ final class KubernetesDeployJobEvent extends AbstractCIKubernetesDeployJobEvent
                 }
             } while (!empty($branchName));
         }
+        if (empty($this->deployBranches)) {
+            $this->deployBranches = [ 'branches' ];
+        }
         return new BranchesModel($this->deployBranches, $this->ignoredBranches);
     }
 
@@ -123,7 +126,7 @@ final class KubernetesDeployJobEvent extends AbstractCIKubernetesDeployJobEvent
      * @param string|null $branchName
      * @return bool
      */
-    private function doesDeployBranchExist(?string $branchName): bool
+    public function doesDeployBranchExist(?string $branchName): bool
     {
         if (empty($branchName)) {
             return false;
@@ -140,7 +143,7 @@ final class KubernetesDeployJobEvent extends AbstractCIKubernetesDeployJobEvent
      * @param string|null $branchName
      * @return bool
      */
-    private function doesIgnoredBranchExist(?string $branchName): bool
+    public function doesIgnoredBranchExist(?string $branchName): bool
     {
         $resp = $this->doesDeployBranchExist($branchName);
         if ($resp) {
