@@ -27,11 +27,13 @@ final class DockerComposeDeployJobEvent extends AbstractCIDockerComposeDeployJob
     protected function addDeployJob(string $dockerComposeFilename): void
     {
         $this->output->writeln("\n🦊 Currently, we only support a deploy on a remote server and on a single branch when using Docker Compose as orchestrator!");
+        $this->output->writeln("Important: If you're using a dot env file, make sure to create it on your remote server!");
         $branchesModel = $this->getBranch();
         $remoteIP = $this->getRemoteIP();
         $remoteUser = $this->getRemoteUser();
         $remoteBasePath = $this->getRemoteBasePath();
         $isManual = $this->deployManually();
+        $this->prompt->printAltBlock("GitLab: adding deploy job...");
         $context = new BaseGitLabCIContext();
         $context->setBranchesModel($branchesModel);
         $context->toMetadata();

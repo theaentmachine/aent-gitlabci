@@ -2,24 +2,25 @@
 
 namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 
+use TheAentMachine\AentGitLabCI\Context\BaseGitLabCIContext;
 use TheAentMachine\AentGitLabCI\Exception\JobException;
-use TheAentMachine\AentGitLabCI\GitLabCI\Job\Model\BranchesModel;
 
 final class BuildDockerfileJob extends AbstractBuildJob
 {
     /**
      * BuildDockerfileJob constructor.
-     * @param string $envName
      * @param string $serviceName
-     * @param string $registryDomainName
-     * @param string $projectGroup
-     * @param string $projectName
-     * @param BranchesModel $branchesModel
+     * @param string $dockerfileName
+     * @param BaseGitLabCIContext $context
      * @throws JobException
      */
-    public function __construct(string $envName, string $serviceName, string $registryDomainName, string $projectGroup, string $projectName, string $dockerfileName, BranchesModel $branchesModel)
+    public function __construct(string $serviceName, string $dockerfileName, BaseGitLabCIContext $context)
     {
-        parent::__construct($envName, $serviceName);
+        parent::__construct($context->getEnvironmentName(), $serviceName);
+        $branchesModel = $context->getBranchesModel();
+        $registryDomainName = $context->getRegistryDomainName();
+        $projectGroup = $context->getProjectGroup();
+        $projectName = $context->getProjectName();
         $this->isSingleBranch = $branchesModel->isSingleBranch();
         $tag = $this->isSingleBranch ? strtolower($branchesModel->getBranches()[0]) : '#ENVIRONMENT#';
         $this->dockerImageName = "$registryDomainName/$projectGroup/$projectName:$tag";

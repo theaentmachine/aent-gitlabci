@@ -3,6 +3,7 @@
 namespace TheAentMachine\AentGitLabCI\Context;
 
 use TheAentMachine\Aent\Context\Context;
+use TheAentMachine\AentGitLabCI\Exception\JobException;
 use TheAentMachine\AentGitLabCI\GitLabCI\Job\Model\BranchesModel;
 use TheAentMachine\Aenthill\Aenthill;
 
@@ -48,6 +49,7 @@ final class BaseGitLabCIContext extends Context
 
     /**
      * @return self
+     * @throws JobException
      */
     public static function fromMetadata(): self
     {

@@ -2,22 +2,23 @@
 
 namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 
+use TheAentMachine\AentGitLabCI\Context\BaseGitLabCIContext;
 use TheAentMachine\AentGitLabCI\Exception\JobException;
 use TheAentMachine\AentGitLabCI\GitLabCI\Job\Model\BranchesModel;
 
 final class DeployKubernetesJob extends AbstractDeployJob
 {
     /**
-     * @param string $identifier
      * @param string $k8sDirName
+     * @param BaseGitLabCIContext $context
      * @param BranchesModel $branchesModel
      * @param bool $isManual
      * @return DeployKubernetesJob
      * @throws JobException
      */
-    public static function newDeployOnGCloud(string $identifier, string $k8sDirName, BranchesModel $branchesModel, bool $isManual): self
+    public static function newDeployOnGCloud(string $k8sDirName, BaseGitLabCIContext $context, BranchesModel $branchesModel, bool $isManual): self
     {
-        $self = new self($identifier);
+        $self = new self($context->getEnvironmentName());
         $self->image = 'thecodingmachine/k8s-gitlabci:latest';
         $self->variables = [
             'GCLOUD_SERVICE_KEY_BASE64' => 'You should put this value in your secrets CI variables!',
@@ -49,16 +50,16 @@ final class DeployKubernetesJob extends AbstractDeployJob
     }
 
     /**
-     * @param string $identifier
      * @param string $k8sDirName
+     * @param BaseGitLabCIContext $context
      * @param BranchesModel $branchesModel
      * @param bool $isManual
      * @return DeployKubernetesJob
      * @throws JobException
      */
-    public static function newDeployOnRancher(string $identifier, string $k8sDirName, BranchesModel $branchesModel, bool $isManual): self
+    public static function newDeployOnRancher(string $k8sDirName, BaseGitLabCIContext $context, BranchesModel $branchesModel, bool $isManual): self
     {
-        $self = new self($identifier);
+        $self = new self($context->getEnvironmentName());
         $self->image = 'lwolf/kubectl_deployer:latest';
         $self->variables = [
             'KUBECONFIG' => '/root/.kube/config',
