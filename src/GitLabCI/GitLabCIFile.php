@@ -101,6 +101,7 @@ final class GitLabCIFile
      * @param AbstractBuildJob $job
      * @return self
      * @throws GitLabCIFileException
+     * @throws FilesystemException
      */
     public function addBuild(AbstractBuildJob $job): self
     {
@@ -116,6 +117,7 @@ final class GitLabCIFile
      * @param AbstractDeployJob $job
      * @return self
      * @throws GitLabCIFileException
+     * @throws FilesystemException
      */
     public function addDeploy(AbstractDeployJob $job): self
     {
@@ -131,6 +133,7 @@ final class GitLabCIFile
      * @param AbstractCleanupJob $job
      * @return self
      * @throws GitLabCIFileException
+     * @throws FilesystemException
      */
     public function addCleanUp(AbstractCleanupJob $job): self
     {
