@@ -3,12 +3,11 @@
 
 namespace TheAentMachine\AentGitLabCI\GitLabCI\Job\Model;
 
-use TheAentMachine\AentGitLabCI\Aenthill\Metadata;
+use TheAentMachine\Aent\Context\ContextInterface;
 use TheAentMachine\AentGitLabCI\Exception\JobException;
-use TheAentMachine\Aenthill\Manifest;
-use TheAentMachine\Exception\ManifestException;
+use TheAentMachine\Aenthill\Aenthill;
 
-final class BranchesModel
+final class BranchesModel implements ContextInterface
 {
     /** @var string[] */
     private $branches;
@@ -32,28 +31,30 @@ final class BranchesModel
     }
 
     /**
-     * @return BranchesModel
-     * @throws JobException
-     * @throws ManifestException
+     * @return void
      */
-    public static function newFromMetadata(): self
+    public function toMetadata(): void
     {
-        $branches = \explode(';', Manifest::mustGetMetadata(Metadata::BRANCHES_KEY));
+        Aenthill::update([
+            'BRANCHES' => \implode(';', $this->branches),
+            'BRANCHES_TO_IGNORE' => \implode(';', $this->branchesToIgnore),
+        ]);
+    }
 
-        $branchesToIgnore = Manifest::getMetadata(Metadata::BRANCHES_TO_IGNORE_KEY);
-        $branchesToIgnore = null === $branchesToIgnore ? [] : \explode(';', $branchesToIgnore);
-
+    /**
+     * @return self
+     * @throws JobException
+     */
+    public static function fromMetadata(): self
+    {
+        $branches = \explode(';', Aenthill::metadata('BRANCHES'));
+        $branchesToIgnore = \explode(';', Aenthill::metadata('BRANCHES_TO_IGNORE'));
         return new self($branches, $branchesToIgnore);
     }
 
-    public function feedMetadata(): void
-    {
-        Manifest::addMetadata(Metadata::BRANCHES_KEY, \implode(';', $this->branches));
-        if (!empty($this->branchesToIgnore)) {
-            Manifest::addMetadata(Metadata::BRANCHES_TO_IGNORE_KEY, \implode(';', $this->branchesToIgnore));
-        }
-    }
-
+    /**
+     * @return bool
+     */
     public function isSingleBranch(): bool
     {
         return (count($this->branches) === 1 && $this->branches[0] !== 'branches');

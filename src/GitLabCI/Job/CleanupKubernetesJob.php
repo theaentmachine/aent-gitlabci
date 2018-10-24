@@ -1,27 +1,23 @@
 <?php
 
-
 namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 
+use TheAentMachine\AentGitLabCI\Context\BaseGitLabCIContext;
 use TheAentMachine\AentGitLabCI\Exception\JobException;
 use TheAentMachine\AentGitLabCI\GitLabCI\Job\Model\BranchesModel;
 
 final class CleanupKubernetesJob extends AbstractCleanupJob
 {
     /**
-     * @param string $identifier
-     * @param string $registryDomainName
-     * @param string $projectGroup
-     * @param string $projectName
+     * @param BaseGitLabCIContext $context
      * @param BranchesModel $branchesModel
      * @param bool $isManual
      * @return CleanupKubernetesJob
      * @throws JobException
      */
-    public static function newCleanupForGCloud(string $identifier, string $registryDomainName, string $projectGroup, string $projectName, BranchesModel $branchesModel, bool $isManual): self
+    public static function newCleanupForGCloud(BaseGitLabCIContext $context, BranchesModel $branchesModel, bool $isManual): self
     {
-        $self = new self($identifier);
-
+        $self = new self($context->getEnvironmentName());
         $self->image = 'thecodingmachine/k8s-gitlabci:latest';
         $self->variables = [
             'GCLOUD_SERVICE_KEY_BASE64' => 'You should put this value in your secrets CI variables!',
@@ -29,9 +25,9 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
             'GKE_CLUSTER' => 'You should put this value in your secrets CI variables!',
             'ZONE' => 'You should put this value in your secrets CI variables!',
             'KUBECONFIG' => '/root/.kube/config',
-            'REGISTRY_DOMAIN_NAME' => $registryDomainName,
-            'PROJECT_GROUP' => $projectGroup,
-            'PROJECT_NAME' => $projectName
+            'REGISTRY_DOMAIN_NAME' => $context->getRegistryDomainName(),
+            'PROJECT_GROUP' => $context->getProjectGroup(),
+            'PROJECT_NAME' => $context->getProjectName()
         ];
         $scriptTag = $branchesModel->isSingleBranch() ? strtolower($branchesModel->getBranches()[0]) : '${CI_COMMIT_REF_SLUG}';
         $self->script = [
@@ -43,7 +39,6 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
             'kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} delete all --all',
             'kubectl delete namespace ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG}',
         ];
-
         foreach ($branchesModel->getBranches() as $branch) {
             $self->addOnly($branch);
         }
@@ -51,30 +46,25 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
             $self->addExcept($branch);
         }
         $self->manual = $isManual;
-
         return $self;
     }
 
     /**
-     * @param string $identifier
-     * @param string $registryDomainName
-     * @param string $projectGroup
-     * @param string $projectName
+     * @param BaseGitLabCIContext $context
      * @param BranchesModel $branchesModel
      * @param bool $isManual
      * @return CleanupKubernetesJob
      * @throws JobException
      */
-    public static function newCleanupForRancher(string $identifier, string $registryDomainName, string $projectGroup, string $projectName, BranchesModel $branchesModel, bool $isManual): self
+    public static function newCleanupForRancher(BaseGitLabCIContext $context, BranchesModel $branchesModel, bool $isManual): self
     {
-        $self = new self($identifier);
-
+        $self = new self($context->getEnvironmentName());
         $self->image = 'thecodingmachine/gitlab-registry-cleaner:latest';
         $self->variables = [
             'KUBECONFIG' => '/root/.kube/config',
-            'REGISTRY_DOMAIN_NAME' => $registryDomainName,
-            'PROJECT_GROUP' => $projectGroup,
-            'PROJECT_NAME' => $projectName
+            'REGISTRY_DOMAIN_NAME' => $context->getRegistryDomainName(),
+            'PROJECT_GROUP' => $context->getProjectGroup(),
+            'PROJECT_NAME' => $context->getProjectName()
         ];
         $scriptTag = $branchesModel->isSingleBranch() ? strtolower($branchesModel->getBranches()[0]) : '${CI_COMMIT_REF_SLUG}';
         $self->script = [
@@ -84,7 +74,6 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
             'kubectl delete namespace ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG}',
             '/delete_image.sh ${REGISTRY_DOMAIN_NAME}/${PROJECT_GROUP}/${PROJECT_NAME}:' . $scriptTag,
         ];
-
         foreach ($branchesModel->getBranches() as $branch) {
             $self->addOnly($branch);
         }
@@ -92,7 +81,6 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
             $self->addExcept($branch);
         }
         $self->manual = $isManual;
-
         return $self;
     }
 }

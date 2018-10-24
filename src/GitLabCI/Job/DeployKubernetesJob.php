@@ -1,25 +1,24 @@
 <?php
 
-
 namespace TheAentMachine\AentGitLabCI\GitLabCI\Job;
 
+use TheAentMachine\AentGitLabCI\Context\BaseGitLabCIContext;
 use TheAentMachine\AentGitLabCI\Exception\JobException;
 use TheAentMachine\AentGitLabCI\GitLabCI\Job\Model\BranchesModel;
 
 final class DeployKubernetesJob extends AbstractDeployJob
 {
     /**
-     * @param string $identifier
      * @param string $k8sDirName
+     * @param BaseGitLabCIContext $context
      * @param BranchesModel $branchesModel
      * @param bool $isManual
      * @return DeployKubernetesJob
      * @throws JobException
      */
-    public static function newDeployOnGCloud(string $identifier, string $k8sDirName, BranchesModel $branchesModel, bool $isManual): self
+    public static function newDeployOnGCloud(string $k8sDirName, BaseGitLabCIContext $context, BranchesModel $branchesModel, bool $isManual): self
     {
-        $self = new self($identifier);
-
+        $self = new self($context->getEnvironmentName());
         $self->image = 'thecodingmachine/k8s-gitlabci:latest';
         $self->variables = [
             'GCLOUD_SERVICE_KEY_BASE64' => 'You should put this value in your secrets CI variables!',
@@ -40,7 +39,6 @@ final class DeployKubernetesJob extends AbstractDeployJob
             'for template_file in $(find . -type f -name "*.template"); do sed -e "s/#ENVIRONMENT#/${CI_COMMIT_REF_SLUG}/g" $template_file > ${template_file::-9}; done',
             'for yml_file in $(find . -type f -name "*.yml" -or -name "*.yaml"); do kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} apply -f ${yml_file}; done'
         ];
-
         foreach ($branchesModel->getBranches() as $branch) {
             $self->addOnly($branch);
         }
@@ -48,22 +46,20 @@ final class DeployKubernetesJob extends AbstractDeployJob
             $self->addExcept($branch);
         }
         $self->manual = $isManual;
-
         return $self;
     }
 
     /**
-     * @param string $identifier
      * @param string $k8sDirName
+     * @param BaseGitLabCIContext $context
      * @param BranchesModel $branchesModel
      * @param bool $isManual
      * @return DeployKubernetesJob
      * @throws JobException
      */
-    public static function newDeployOnRancher(string $identifier, string $k8sDirName, BranchesModel $branchesModel, bool $isManual): self
+    public static function newDeployOnRancher(string $k8sDirName, BaseGitLabCIContext $context, BranchesModel $branchesModel, bool $isManual): self
     {
-        $self = new self($identifier);
-
+        $self = new self($context->getEnvironmentName());
         $self->image = 'lwolf/kubectl_deployer:latest';
         $self->variables = [
             'KUBECONFIG' => '/root/.kube/config',
@@ -79,7 +75,6 @@ final class DeployKubernetesJob extends AbstractDeployJob
             'for template_file in $(find . -type f -name "*.template"); do sed -e "s/#ENVIRONMENT#/${CI_COMMIT_REF_SLUG}/g" $template_file > ${template_file::-9}; done',
             'for yml_file in $(find . -type f -name "*.yml" -or -name "*.yaml"); do kubectl -n ${CI_PROJECT_PATH_SLUG}-${CI_COMMIT_REF_SLUG} apply -f ${yml_file}; done'
         ];
-
         foreach ($branchesModel->getBranches() as $branch) {
             $self->addOnly($branch);
         }
@@ -87,7 +82,6 @@ final class DeployKubernetesJob extends AbstractDeployJob
             $self->addExcept($branch);
         }
         $self->manual = $isManual;
-
         return $self;
     }
 }
