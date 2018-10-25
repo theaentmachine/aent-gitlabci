@@ -5,6 +5,7 @@ namespace TheAentMachine\AentGitLabCI\Event;
 use Safe\Exceptions\FilesystemException;
 use TheAentMachine\Aent\Event\CI\AbstractCIKubernetesDeployJobEvent;
 use TheAentMachine\Aent\K8SProvider\Provider;
+use TheAentMachine\Aent\Payload\CI\KubernetesReplyDeployJobPayload;
 use TheAentMachine\AentGitLabCI\Context\BaseGitLabCIContext;
 use TheAentMachine\AentGitLabCI\Exception\GitLabCIFileException;
 use TheAentMachine\AentGitLabCI\Exception\JobException;
@@ -26,12 +27,13 @@ final class KubernetesDeployJobEvent extends AbstractCIKubernetesDeployJobEvent
     /**
      * @param string $directoryName
      * @param Provider $provider
+     * @return KubernetesReplyDeployJobPayload
      * @throws FilesystemException
      * @throws GitLabCIFileException
      * @throws JobException
      * @throws MissingEnvironmentVariableException
      */
-    protected function addDeployJob(string $directoryName, Provider $provider): void
+    protected function addDeployJob(string $directoryName, Provider $provider): KubernetesReplyDeployJobPayload
     {
         $this->output->writeln("\n🦊 Currently, we only support a deploy on branches when using Kubernetes as orchestrator!");
         $branchesModel = $this->getBranches();
@@ -55,6 +57,7 @@ final class KubernetesDeployJobEvent extends AbstractCIKubernetesDeployJobEvent
             $job = CleanupKubernetesJob::newCleanupForRancher($context, $branchesModel, $isManual);
         }
         $file->addCleanUp($job);
+        return new KubernetesReplyDeployJobPayload(!$branchesModel->isSingleBranch());
     }
 
     /**
