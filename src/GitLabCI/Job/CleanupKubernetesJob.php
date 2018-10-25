@@ -45,7 +45,7 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
         foreach ($branchesModel->getBranchesToIgnore() as $branch) {
             $self->addExcept($branch);
         }
-        $self->manual = $isManual;
+        $self->manual = true;
         return $self;
     }
 
@@ -80,7 +80,7 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
         foreach ($branchesModel->getBranchesToIgnore() as $branch) {
             $self->addExcept($branch);
         }
-        $self->manual = $isManual;
+        $self->manual = true;
         return $self;
     }
 }
