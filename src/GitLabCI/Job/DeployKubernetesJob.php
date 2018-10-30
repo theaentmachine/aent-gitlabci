@@ -60,7 +60,7 @@ final class DeployKubernetesJob extends AbstractDeployJob
     public static function newDeployOnRancher(string $k8sDirName, BaseGitLabCIContext $context, BranchesModel $branchesModel, bool $isManual): self
     {
         $self = new self($context->getEnvironmentName());
-        $self->image = 'lwolf/kubectl_deployer:latest';
+        $self->image = 'thecodingmachine/k8s-gitlabci:latest';
         $self->variables = [
             'KUBECONFIG' => '/root/.kube/config',
             'K8S_DIRNAME' => $k8sDirName,
