@@ -45,6 +45,10 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
         foreach ($branchesModel->getBranchesToIgnore() as $branch) {
             $self->addExcept($branch);
         }
+        $self->environment = [
+            'name' => 'review/$CI_COMMIT_REF_NAME',
+            'action' => 'stop',
+        ];
         $self->manual = true;
         return $self;
     }
@@ -80,6 +84,10 @@ final class CleanupKubernetesJob extends AbstractCleanupJob
         foreach ($branchesModel->getBranchesToIgnore() as $branch) {
             $self->addExcept($branch);
         }
+        $self->environment = [
+            'name' => 'review/$CI_COMMIT_REF_NAME',
+            'action' => 'stop',
+        ];
         $self->manual = true;
         return $self;
     }
