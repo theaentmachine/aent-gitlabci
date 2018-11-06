@@ -49,6 +49,10 @@ final class DeployDockerComposeJob extends AbstractDeployJob
         foreach ($branchesModel->getBranchesToIgnore() as $branch) {
             $self->addExcept($branch);
         }
+        $self->environment = [
+            'name' => 'review/$CI_COMMIT_REF_NAME',
+            'url' => '# updates this with your environment URL',
+        ];
         $self->manual = $isManual;
         return $self;
     }

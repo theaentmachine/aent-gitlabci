@@ -160,4 +160,12 @@ abstract class AbstractJob
     {
         return !empty($this->except);
     }
+
+    /**
+     * @return string
+     */
+    public function getJobName(): string
+    {
+        return $this->jobName;
+    }
 }

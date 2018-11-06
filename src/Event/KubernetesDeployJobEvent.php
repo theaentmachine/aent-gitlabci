@@ -38,25 +38,24 @@ final class KubernetesDeployJobEvent extends AbstractCIKubernetesDeployJobEvent
         $this->output->writeln("\n🦊 Currently, we only support a deploy on branches when using Kubernetes as orchestrator!");
         $branchesModel = $this->getBranches();
         $isManual = $this->deployManually();
-        $this->prompt->printAltBlock("GitLab: adding deploy job...");
+        $this->prompt->printAltBlock("GitLab: adding deploy and cleanup jobs...");
         $context = new BaseGitLabCIContext();
         $context->setBranchesModel($branchesModel);
         $context->toMetadata();
         if ($provider->getName() === Provider::GOOGLE_CLOUD) {
-            $job = DeployKubernetesJob::newDeployOnGCloud($directoryName, $context, $branchesModel, $isManual);
+            $cleanupJob = CleanupKubernetesJob::newCleanupForGCloud($context, $branchesModel, $isManual);
         } else {
-            $job = DeployKubernetesJob::newDeployOnRancher($directoryName, $context, $branchesModel, $isManual);
+            $cleanupJob = CleanupKubernetesJob::newCleanupForRancher($context, $branchesModel, $isManual);
+        }
+        if ($provider->getName() === Provider::GOOGLE_CLOUD) {
+            $deployJob = DeployKubernetesJob::newDeployOnGCloud($directoryName, $context, $branchesModel, $cleanupJob->getJobName(), $isManual);
+        } else {
+            $deployJob = DeployKubernetesJob::newDeployOnRancher($directoryName, $context, $branchesModel, $cleanupJob->getJobName(), $isManual);
         }
         $file = new GitLabCIFile();
         $file->findOrCreate();
-        $file->addDeploy($job);
-        $this->prompt->printAltBlock("GitLab: adding cleanup job...");
-        if ($provider->getName() === Provider::GOOGLE_CLOUD) {
-            $job = CleanupKubernetesJob::newCleanupForGCloud($context, $branchesModel, $isManual);
-        } else {
-            $job = CleanupKubernetesJob::newCleanupForRancher($context, $branchesModel, $isManual);
-        }
-        $file->addCleanUp($job);
+        $file->addDeploy($deployJob);
+        $file->addCleanUp($cleanupJob);
         return new KubernetesReplyDeployJobPayload(!$branchesModel->isSingleBranch());
     }
 

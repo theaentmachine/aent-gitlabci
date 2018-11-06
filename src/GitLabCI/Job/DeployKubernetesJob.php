@@ -12,11 +12,12 @@ final class DeployKubernetesJob extends AbstractDeployJob
      * @param string $k8sDirName
      * @param BaseGitLabCIContext $context
      * @param BranchesModel $branchesModel
+     * @param string $cleanupJobIdentifier
      * @param bool $isManual
      * @return DeployKubernetesJob
      * @throws JobException
      */
-    public static function newDeployOnGCloud(string $k8sDirName, BaseGitLabCIContext $context, BranchesModel $branchesModel, bool $isManual): self
+    public static function newDeployOnGCloud(string $k8sDirName, BaseGitLabCIContext $context, BranchesModel $branchesModel, string $cleanupJobIdentifier, bool $isManual): self
     {
         $self = new self($context->getEnvironmentName());
         $self->image = 'thecodingmachine/k8s-gitlabci:latest';
@@ -45,6 +46,11 @@ final class DeployKubernetesJob extends AbstractDeployJob
         foreach ($branchesModel->getBranchesToIgnore() as $branch) {
             $self->addExcept($branch);
         }
+        $self->environment = [
+            'name' => 'review/$CI_COMMIT_REF_NAME',
+            'url' => '# updates this with your environment URL',
+            'on_stop' => $cleanupJobIdentifier
+        ];
         $self->manual = $isManual;
         return $self;
     }
@@ -53,11 +59,12 @@ final class DeployKubernetesJob extends AbstractDeployJob
      * @param string $k8sDirName
      * @param BaseGitLabCIContext $context
      * @param BranchesModel $branchesModel
+     * @param string $cleanupJobIdentifier
      * @param bool $isManual
      * @return DeployKubernetesJob
      * @throws JobException
      */
-    public static function newDeployOnRancher(string $k8sDirName, BaseGitLabCIContext $context, BranchesModel $branchesModel, bool $isManual): self
+    public static function newDeployOnRancher(string $k8sDirName, BaseGitLabCIContext $context, BranchesModel $branchesModel, string $cleanupJobIdentifier, bool $isManual): self
     {
         $self = new self($context->getEnvironmentName());
         $self->image = 'thecodingmachine/k8s-gitlabci:latest';
@@ -81,6 +88,11 @@ final class DeployKubernetesJob extends AbstractDeployJob
         foreach ($branchesModel->getBranchesToIgnore() as $branch) {
             $self->addExcept($branch);
         }
+        $self->environment = [
+            'name' => 'review/$CI_COMMIT_REF_NAME',
+            'url' => '# updates this with your environment URL',
+            'on_stop' => $cleanupJobIdentifier
+        ];
         $self->manual = $isManual;
         return $self;
     }
